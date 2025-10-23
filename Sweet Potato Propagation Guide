@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sweet Potato Farmer Dashboard</title>
+    <title>Sweet Potato Farming and Tracking Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Styles for Cartoon Look */
+        /* Custom Styles for Cartoon Look (Restored from V1) */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         :root {
             --color-primary: #D35400; /* Darker Orange/Terra Cotta */
@@ -52,6 +52,22 @@
             transform: translateY(4px);
             box-shadow: 0px 0px 0px #B7950B;
         }
+        /* Added style for the new Reporting button */
+        .btn-tertiary {
+            background-color: #e0e7ff;
+            border: 3px solid #a5b4fc;
+            color: #3730a3;
+            transition: all 0.1s ease-in-out;
+            box-shadow: 4px 4px 0px #a5b4fc;
+        }
+        .btn-tertiary:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px #a5b4fc;
+        }
+        .btn-tertiary:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #a5b4fc;
+        }
         .step-content {
             transition: opacity 0.3s ease-in-out;
         }
@@ -64,6 +80,9 @@
 
         .activity-log-card {
             box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+        .log-entry-card {
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
         }
         .link-btn {
             background-color: #E0E7FF;
@@ -78,6 +97,75 @@
         .link-btn:hover {
             background-color: #C7D2FE;
         }
+        
+        /* NEW Styles for Collapsible Sections */
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-in-out;
+            max-height: 2000px; /* Set to a large value */
+            opacity: 1;
+        }
+        .collapsible-content.hidden {
+            max-height: 0;
+            opacity: 0;
+        }
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        .chevron-icon.rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background-color: white;
+                font-family: 'Inter', sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .guide-card {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+                padding: 0;
+            }
+            header, #guide-footer, .no-print {
+                display: none;
+            }
+            #reporting-tool {
+                display: block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+            .report-section {
+                margin-top: 2rem;
+                padding: 1rem;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                page-break-inside: avoid;
+            }
+            .collapsible-content {
+                max-height: none !important;
+                opacity: 1 !important;
+                display: block !important;
+            }
+            .chevron-icon {
+                display: none;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        }
     </style>
 </head>
 <body class="p-4 flex items-start justify-center min-h-screen pt-8">
@@ -88,14 +176,14 @@
         <!-- Title and Progress -->
         <header class="mb-6">
             <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 text-center mb-1">
-                Sweet Potato Farmer's Plan 🍠
+                Sweet Potato Farming and Tracking Guide 🍠
             </h1>
             <p class="text-center text-gray-500 font-medium mb-4">
                 Smart Steps for Growing, Tracking, and Selling (11 Phases)
             </p>
             
             <!-- Planner and Log Toggle Tabs -->
-            <div class="flex space-x-2 mb-4">
+            <div class="grid grid-cols-3 space-x-2 mb-4">
                 <button id="toggle-guide-btn" class="flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm">
                     Step-by-Step Guide
                 </button>
@@ -104,6 +192,9 @@
                 </button>
                 <button id="toggle-log-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
                     My Project Log ✅
+                </button>
+                <button id="toggle-reporting-btn" class="col-span-3 mt-2 flex-1 btn-tertiary px-4 py-2 rounded-lg font-bold text-sm">
+                    Reporting & Analysis 📊
                 </button>
             </div>
             
@@ -164,24 +255,32 @@
             <div id="project-log-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
                 <h3 class="text-xl font-bold mb-4 text-gray-700">My Project Activity Log <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
                 
-                <p class="text-sm text-gray-600 mb-4">Use this log to mark steps complete, record the date you did them, and track metrics like soil pH or kilograms harvested.</p>
+                <p class="text-sm text-gray-600 mb-4">Use this log to mark steps complete, record the date you did them, and add multiple data entries for key metrics. Click a step title to expand or collapse it.</p>
 
                 <div id="log-entries" class="space-y-4">
                     <!-- Log fields for each step will be inserted here -->
                 </div>
+            </div>
 
-                <div id="harvest-metrics" class="mt-6 p-4 activity-log-card bg-white rounded-lg">
-                    <h4 class="font-bold text-gray-700 mb-2">Harvest Results (Step 8)</h4>
-                    <label for="harvest-date" class="block text-sm font-medium text-gray-700">Actual Harvest Date:</label>
-                    <input type="date" id="harvest-date" onchange="saveLog('harvest')" class="p-2 border rounded-md shadow-inner w-full mb-3">
-
-                    <label for="harvest-kg" class="block text-sm font-medium text-gray-700">Total Harvest (Kg):</label>
-                    <input type="number" id="harvest-kg" onchange="saveLog('harvest')" placeholder="e.g., 25.5" class="p-2 border rounded-md shadow-inner w-full mb-3">
-
-                    <button onclick="saveLog('harvest', true)" class="w-full btn-primary py-2 text-sm rounded-lg">Record Harvest</button>
-                    <p id="harvest-status" class="text-xs text-green-600 mt-2"></p>
+            <!-- Reporting Tool Area (Starts Hidden) -->
+            <div id="reporting-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                <h3 class="text-xl font-bold mb-4 text-gray-700">Reporting & Analysis <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
+                <div class="flex gap-4 mb-4 no-print">
+                    <button onclick="renderReport(true)" class="flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm">
+                        Refresh Report
+                    </button>
+                    <button onclick="window.print()" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                        Print Report
+                    </button>
+                    <button id="download-json-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                        Download Data (JSON)
+                    </button>
+                </div>
+                <div id="report-output" class="p-4 bg-white rounded-lg border">
+                    <p class="text-gray-500 italic">Click "Refresh Report" to see your project data.</p>
                 </div>
             </div>
+
 
             <!-- Progress Bar (Only visible with Guide) -->
             <div id="progress-container" class="mt-6">
@@ -265,15 +364,97 @@
         ];
 
         // Base Schedule Definitions (used for log fields and relative step ordering)
+        // UPDATED with new logFields structure
         const baseSchedule = [
-            { id: 'start_mother', step: 1, activity: 'Start Mother Tuber', color: 'orange', durationKey: 'daysMotherStart', icon: '💧', phase: 'Sprouting', logFields: [{ label: 'Mother Potatoes Started', unit: 'potatoes' }], details: 'Place mother potato in water to begin slip production.' },
-            { id: 'root_slips', step: 3, activity: 'Start Rooting Slips', color: 'blue', durationKey: 'daysPropagation', icon: '✂️', phase: 'Rooting', logFields: [{ label: 'Slips Cut', unit: 'slips' }], details: 'Cut slips and place them in water to grow roots.' },
-            { id: 'soil_prep', step: 4, activity: 'Soil Test & Field Prep', color: 'gray', durationKey: 'daysPrePlantingPrep', icon: '⛰️', phase: 'Field Prep', logFields: [{ label: 'Soil pH Reading', unit: 'pH' }], details: 'Test soil pH and prepare mounds for planting.' },
-            { id: 'plant_field', step: 5, activity: 'Plant Slips in Field (Day 0)', color: 'green', durationKey: 'daysToHarvest', icon: '🌱', phase: 'Growing', logFields: [{ label: 'Slips Planted', unit: 'slips' }], details: 'Plant rooted slips in warm, mounded soil.' },
-            { id: 'scouting_start', step: 6, activity: 'Pest/Disease Scouting', color: 'blue', fixedStartDays: 30, durationDays: 60, icon: '🔎', phase: 'Monitoring', logFields: [{ label: 'Pest Sightings', unit: 'count' }], details: 'Active monitoring period for pests and disease (Days 30-90).' },
-            { id: 'harvest', step: 8, activity: 'Harvest Tubers', color: 'brown', offsetKey: 'daysToHarvest', durationDays: 0, icon: '🧺', phase: 'Harvesting', logFields: [], details: 'Dig tubers when vines die back. Log your harvest metrics.' }, 
-            { id: 'cure', step: 9, activity: 'Start Curing', color: 'orange', offsetKey: 'daysToHarvest', durationDays: 10, icon: '🔥', phase: 'Curing', logFields: [], details: 'Cure potatoes for 10 days in a warm, dark place to sweeten and heal skin.' },
-            { id: 'storage', step: 10, activity: 'Begin Storage/Sale', color: 'gray', offsetKey: 'daysToHarvest', durationDays: 10, fixedEndOffset: 10, icon: '📦', phase: 'Storage', logFields: [], details: 'Move cured potatoes to cool, dry storage (55-60°F).' },
+            { id: 'start_mother', step: 1, activity: 'Start Mother Tuber', color: 'orange', durationKey: 'daysMotherStart', icon: '💧', phase: 'Sprouting', 
+                logFields: [
+                    { label: 'Date Started', type: 'date' },
+                    { label: 'Tuber ID/Name', type: 'text', placeholder: 'e.g., Mother A' },
+                    { label: 'Generation', type: 'text', placeholder: 'e.g., G0, G1' },
+                    { label: 'Source', type: 'text', placeholder: 'e.g., Store, Saved' }
+                ], 
+                details: 'Place mother potato in water to begin slip production.' 
+            },
+            { id: 'cut_slips', step: 2, activity: 'Cut Slips', color: 'blue', icon: '✂️', phase: 'Sprouting',
+                logFields: [
+                    { label: 'Date Cut', type: 'date' },
+                    { label: 'From Tuber ID', type: 'text', placeholder: 'e.g., Mother A' },
+                    { label: 'Slips Cut', type: 'number', placeholder: 'e.g., 15' }
+                ],
+                details: 'Cut slips from mother tubers.'
+            },
+            { id: 'root_slips', step: 3, activity: 'Start Rooting Slips', color: 'blue', durationKey: 'daysPropagation', icon: '✂️', phase: 'Rooting', 
+                logFields: [
+                    { label: 'Date Rooting Started', type: 'date' },
+                    { label: 'Slips Put in Water', type: 'number', placeholder: 'e.g., 15' }
+                ], 
+                details: 'Cut slips and place them in water to grow roots.' 
+            },
+            { id: 'soil_prep', step: 4, activity: 'Soil Test & Field Prep', color: 'gray', durationKey: 'daysPrePlantingPrep', icon: '⛰️', phase: 'Field Prep', 
+                logFields: [
+                    { label: 'Date Tested', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Soil pH', type: 'number', placeholder: 'e.g., 6.1' }
+                ], 
+                details: 'Test soil pH and prepare mounds for planting.' 
+            },
+            { id: 'plant_field', step: 5, activity: 'Plant Slips in Field (Day 0)', color: 'green', durationKey: 'daysToHarvest', icon: '🌱', phase: 'Growing', 
+                logFields: [
+                    { label: 'Date Planted', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Slips Planted', type: 'number', placeholder: 'e.g., 50' }
+                ], 
+                details: 'Plant rooted slips in warm, mounded soil.' 
+            },
+            { id: 'scouting_start', step: 6, activity: 'Pest/Disease Scouting', color: 'blue', fixedStartDays: 30, durationDays: 60, icon: '🔎', phase: 'Monitoring', 
+                logFields: [
+                    { label: 'Date Sighted', type: 'date' },
+                    { label: 'Pest/Disease Name', type: 'text', placeholder: 'e.g., Aphids' },
+                    { label: 'GPS (Lat, Lon)', type: 'text', placeholder: 'e.g., 40.71, -74.00' },
+                    { label: 'Notes/Action Taken', type: 'textarea', placeholder: 'Spotted on 3 plants...' }
+                ], 
+                details: 'Active monitoring period for pests and disease (Days 30-90).' 
+            },
+            { id: 'manage_vines', step: 7, activity: 'Vine Management (Pruning)', color: 'green', icon: '✂️', phase: 'Monitoring',
+                logFields: [
+                    { label: 'Date Pruned', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Notes', type: 'textarea', placeholder: 'e.g., Pruned runners...' }
+                ],
+                details: 'Log dates of vine pruning or maintenance.'
+            },
+            { id: 'harvest', step: 8, activity: 'Harvest Tubers', color: 'brown', offsetKey: 'daysToHarvest', durationDays: 0, icon: '🧺', phase: 'Harvesting', 
+                logFields: [
+                    { label: 'Harvest Date', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Total Harvest (Kg)', type: 'number', placeholder: 'e.g., 12.5' }
+                ], 
+                details: 'Dig tubers when vines die back. Log your harvest metrics.' 
+            }, 
+            { id: 'cure', step: 9, activity: 'Start Curing', color: 'orange', offsetKey: 'daysToHarvest', durationDays: 10, icon: '🔥', phase: 'Curing', 
+                logFields: [
+                    { label: 'Curing Start Date', type: 'date' },
+                    { label: 'Location', type: 'text', placeholder: 'e.g., Curing Shed' },
+                    { label: 'Avg. Temp (°F)', type: 'number', placeholder: 'e.g., 80' }
+                ], 
+                details: 'Cure potatoes for 10 days in a warm, dark place to sweeten and heal skin.' 
+            },
+            { id: 'storage', step: 10, activity: 'Begin Storage/Sale', color: 'gray', offsetKey: 'daysToHarvest', durationDays: 10, fixedEndOffset: 10, icon: '📦', phase: 'Storage', 
+                logFields: [
+                    { label: 'Storage Start Date', type: 'date' },
+                    { label: 'Location', type: 'text', placeholder: 'e.g., Root Cellar' }
+                ], 
+                details: 'Move cured potatoes to cool, dry storage (55-60°F).' 
+            },
+            { id: 'sale', step: 11, activity: 'Log Sale', color: 'green', icon: '🤝', phase: 'Sales',
+                logFields: [
+                    { label: 'Sale Date', type: 'date' },
+                    { label: 'Quantity Sold (Kg)', type: 'number', placeholder: 'e.g., 25' },
+                    { label: 'Price per Kg ($)', type: 'number', placeholder: 'e.g., 1.50' },
+                    { label: 'Customer/Market', type: 'text', placeholder: 'e.g., Farmer\'s Market' }
+                ],
+                details: 'Log sales data to track revenue.'
+            }
         ];
 
 
@@ -289,12 +470,15 @@
         const nextBtn = document.getElementById('next-btn');
         const plannerTool = document.getElementById('planner-tool');
         const projectLogTool = document.getElementById('project-log-tool');
+        const reportingTool = document.getElementById('reporting-tool');
+        const reportOutput = document.getElementById('report-output');
         const progressContainer = document.getElementById('progress-container');
         const guideFooter = document.getElementById('guide-footer');
 
         const toggleGuideBtn = document.getElementById('toggle-guide-btn');
         const togglePlannerBtn = document.getElementById('toggle-planner-btn');
         const toggleLogBtn = document.getElementById('toggle-log-btn');
+        const toggleReportingBtn = document.getElementById('toggle-reporting-btn');
 
         const plantingDateInput = document.getElementById('planting-date');
         const calendarOutput = document.getElementById('calendar-output');
@@ -306,8 +490,12 @@
 
         // --- STATE & UTILITIES ---
         let currentStep = 0;
-        let activeView = 'guide'; // 'guide', 'planner', 'log'
-        // Simple in-memory storage for logs
+        let activeView = 'guide'; // 'guide', 'planner', 'log', 'reporting'
+        
+        // NEW Data Structure: Log now holds multiple entries per step
+        // projectLog = { 
+        //   'step_id': { done: false, date: '', entries: [ { 'Field Label': 'value', ... }, ... ] } 
+        // }
         let projectLog = {}; 
         
         const COLORS = {
@@ -347,7 +535,7 @@
 
         // Helper: Get Google Calendar URL for ALL events (iCal/Web Cal)
         function getBulkCalendarUrl(events) {
-            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            const baseUrl = 'https.calendar.google.com/calendar/render?action=TEMPLATE';
             let bulkTitle = "Sweet Potato Full Project Plan";
             let bulkDetails = "Your full scheduled plan, calculated based on your Planting Date:\n";
 
@@ -375,6 +563,19 @@
             return parseFloat(document.getElementById(id)?.value) || 0;
         };
 
+        // --- NEW: Collapsible Section Toggle ---
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const icon = document.querySelector(`[data-controls="${sectionId}"] .chevron-icon`);
+            
+            if (content) {
+                content.classList.toggle('hidden');
+            }
+            if (icon) {
+                icon.classList.toggle('rotate-180');
+            }
+        }
+
         // --- SCHEDULING LOGIC (DYNAMICALLY GENERATED) ---
         
         function getDynamicSchedule() {
@@ -387,17 +588,20 @@
             const scheduleOffsets = {
                 // Pre-Planting (offsets are calculated backward from Day 0 Planting)
                 'start_mother': -(daysMotherStart + daysPropagation),
+                'cut_slips': -daysPropagation - (daysMotherStart / 2), // Estimate cut slips halfway through sprouting
                 'root_slips': -daysPropagation,
                 'soil_prep': -daysPrePlantingPrep,
                 
                 // Growing Phase (Day 0 Planting)
                 'plant_field': 0,
                 'scouting_start': 30, // Fixed start day after planting
+                'manage_vines': 45, // Set offset to 45 days post-planting
                 
                 // Post-Planting (offsets are calculated forward from Day 0 Planting)
                 'harvest': daysToHarvest,
                 'cure': daysToHarvest, // Curing starts on harvest day
                 'storage': daysToHarvest + 10, // Storage starts 10 days after harvest/curing starts
+                'sale': daysToHarvest + 10, // Sales can start after curing/storage begins
             };
 
             const dynamicSchedule = baseSchedule.map(event => {
@@ -443,6 +647,14 @@
             let eventsWithDates = [];
 
             dynamicSchedule.forEach((event, index) => {
+                // Skip events with no duration (like 'cut_slips' which is just for logging)
+                if (event.durationKey === undefined && event.durationDays === undefined && event.fixedStartDays === undefined) {
+                    // UPDATED: Check if logFields exist. If they do, but it's not a "duration" event (like sales), we should still show it.
+                    // But we will still skip cut_slips as it's an intermittent logging activity.
+                    if (event.id === 'cut_slips') return; 
+                    if ((!event.logFields || event.logFields.length === 0)) return;
+                }
+
                 const eventDate = new Date(plantingDate);
                 eventDate.setDate(plantingDate.getDate() + event.offsetDays);
                 const readableDate = eventDate.toDateString();
@@ -500,88 +712,142 @@
             addAllBtn.classList.remove('hidden');
         }
 
-        // --- ACTIVITY LOG LOGIC ---
+        // --- ACTIVITY LOG LOGIC (REFACTORED) ---
         
-        function updateLogValues(id, label, value) {
-            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
-            projectLog[id].values[label] = value;
-            // Re-render to show updated status if required
-            const statusElement = document.getElementById(`${id}-status`);
-            if (statusElement) {
-                 statusElement.textContent = `Metrics updated.`;
-            }
-        }
-
         function renderLog() {
             let html = '';
             steps.forEach((step, index) => {
                 // Find corresponding schedule data for log fields
                 const logData = baseSchedule.find(d => d.step === index + 1);
                 
-                // Skip steps 9-11 as they are post-harvest or conceptual, and 8 is handled in harvest-metrics
-                if (step.id === 'cure' || step.id === 'storage' || step.id === 'sale' || step.id === 'harvest') return; 
+                // Skip steps that have no loggable fields (like 7, 9, 10, 11)
+                // UPDATED: This check is now dynamic based on logFields.
+                if (!logData || !logData.logFields || logData.logFields.length === 0) return; 
 
-                const stepLog = projectLog[step.id] || { done: false, date: '', values: {} };
+                const stepLog = projectLog[step.id] || { done: false, date: '', entries: [] };
                 
-                let valueInputs = '';
-                if (logData && logData.logFields) {
-                    logData.logFields.forEach(field => {
-                        const currentValue = stepLog.values[field.label] || '';
-                        valueInputs += `
-                            <label for="${step.id}-${field.label}" class="block text-sm font-medium text-gray-700 mt-1">${field.label} (${field.unit}):</label>
-                            <input type="${field.unit === 'pH' ? 'number' : 'number'}" 
-                                id="${step.id}-${field.label}" 
-                                value="${currentValue}" 
-                                onchange="updateLogValues('${step.id}', '${field.label}', this.value)"
-                                placeholder="Enter ${field.label}" 
-                                class="p-2 border rounded-md shadow-inner w-full mb-2 text-sm">
-                        `;
-                    });
-                }
-                
+                // Render the individual entries for this step
+                let entriesHtml = '<div class="space-y-3 mt-4">';
+                stepLog.entries.forEach((entry, entryIndex) => {
+                    entriesHtml += renderLogEntry(step.id, entryIndex, logData.logFields, entry);
+                });
+                entriesHtml += '</div>';
+
+                const contentId = `log-content-${step.id}`;
+
                 html += `
                     <div class="p-4 activity-log-card bg-white rounded-lg border-l-4 ${stepLog.done ? 'border-green-600' : 'border-gray-300'}">
-                        <div class="flex items-center justify-between">
+                        <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('${contentId}')" data-controls="${contentId}">
                             <p class="font-bold text-gray-700">${step.visual.replace(/→/g, '→')} Step ${index + 1}: ${step.title}</p>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" ${stepLog.done ? 'checked' : ''} onchange="toggleDone('${step.id}', this.checked)" class="h-5 w-5 text-green-600 rounded">
-                                <span class="text-sm font-medium text-gray-600">Done</span>
-                            </label>
+                            <div class="flex items-center">
+                                <label class="flex items-center space-x-2 mr-4" onclick="event.stopPropagation();">
+                                    <input type="checkbox" ${stepLog.done ? 'checked' : ''} onchange="toggleDone('${step.id}', this.checked)" class="h-5 w-5 text-green-600 rounded">
+                                    <span class="text-sm font-medium text-gray-600">Done</span>
+                                </label>
+                                <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+                        </button>
+                        
+                        <div id="${contentId}" class="collapsible-content mt-4">
+                            <label for="${step.id}-date" class="block text-sm font-medium text-gray-700 mt-2">Overall Completion Date (for this step):</label>
+                            <input type="date" id="${step.id}-date" value="${stepLog.date}" onchange="updateDate('${step.id}', this.value)" class="p-2 border rounded-md shadow-inner w-full mb-3 text-sm">
+                            
+                            <h5 class="font-semibold text-gray-700 mt-4 border-t pt-3">Data Entries:</h5>
+                            ${entriesHtml}
+                            
+                            <button onclick="addLogEntry('${step.id}')" class="mt-4 w-full btn-secondary py-2 text-sm rounded-lg font-semibold">
+                                + Add New Entry for Step ${index + 1}
+                            </button>
+                            <p id="${step.id}-status" class="text-xs text-green-600 mt-2 font-medium"></p>
                         </div>
-                        
-                        <label for="${step.id}-date" class="block text-sm font-medium text-gray-700 mt-2">Actual Completion Date:</label>
-                        <input type="date" id="${step.id}-date" value="${stepLog.date}" onchange="updateDate('${step.id}', this.value)" class="p-2 border rounded-md shadow-inner w-full mb-3 text-sm">
-                        
-                        ${valueInputs}
-                        <p id="${step.id}-status" class="text-xs text-green-600 mt-2 font-medium"></p>
                     </div>
                 `;
             });
 
             logEntriesContainer.innerHTML = html;
 
-            // Re-render Harvest Metrics separately (Step 8)
-            const harvestLog = projectLog['harvest'] || { date: '', values: {} };
-            document.getElementById('harvest-date').value = harvestLog.date || '';
-            document.getElementById('harvest-kg').value = harvestLog.values['Total Harvest (Kg)'] || '';
-
             // Update status messages after rendering (important for dynamic content)
             for (const key in projectLog) {
                 const statusElement = document.getElementById(`${key}-status`);
                 if (statusElement && projectLog[key].done) {
                     const dateText = projectLog[key].date || 'N/A';
-                    statusElement.textContent = `Completed on: ${dateText}.`;
-                    
-                    if (projectLog[key].values && Object.keys(projectLog[key].values).length > 0) {
-                        statusElement.textContent += ' Metrics logged.';
-                    }
+                    statusElement.textContent = `Step marked complete on: ${dateText}.`;
                 }
             }
+        }
+
+        function renderLogEntry(stepId, entryIndex, logFields, entryData) {
+            let fieldsHtml = '';
+            logFields.forEach(field => {
+                const value = entryData[field.label] || '';
+                const placeholder = field.placeholder || `Enter ${field.label}`;
+                if (field.type === 'textarea') {
+                    fieldsHtml += `
+                        <label class="block text-sm font-medium text-gray-700">${field.label}:</label>
+                        <textarea onchange="updateLogEntry('${stepId}', ${entryIndex}, '${field.label}', this.value)"
+                            placeholder="${placeholder}"
+                            class="p-2 border rounded-md shadow-inner w-full mb-2 text-sm">${value}</textarea>
+                    `;
+                } else {
+                    fieldsHtml += `
+                        <label class="block text-sm font-medium text-gray-700">${field.label}:</label>
+                        <input type="${field.type}" value="${value}" 
+                            onchange="updateLogEntry('${stepId}', ${entryIndex}, '${field.label}', this.value)"
+                            placeholder="${placeholder}" 
+                            class="p-2 border rounded-md shadow-inner w-full mb-2 text-sm">
+                    `;
+                }
+            });
+
+            return `
+                <div class="p-3 bg-gray-50 rounded-lg border log-entry-card">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-600">Entry ${entryIndex + 1}</p>
+                        <button onclick="removeLogEntry('${stepId}', ${entryIndex})" 
+                            class="text-xs text-red-600 font-semibold hover:text-red-800">
+                            Remove
+                        </button>
+                    </div>
+                    ${fieldsHtml}
+                </div>
+            `;
+        }
+
+        function addLogEntry(stepId) {
+            projectLog[stepId] = projectLog[stepId] || { done: false, date: '', entries: [] };
             
+            const logData = baseSchedule.find(d => d.step === steps.findIndex(s => s.id === stepId) + 1);
+            if (!logData) return;
+
+            const newEntry = {};
+            logData.logFields.forEach(field => {
+                newEntry[field.label] = ''; // Initialize with empty values
+            });
+
+            projectLog[stepId].entries.push(newEntry);
+            renderLog(); // Re-render the log to show the new entry form
+        }
+
+        function removeLogEntry(stepId, entryIndex) {
+            const stepLog = projectLog[stepId];
+            if (stepLog && stepLog.entries[entryIndex]) {
+                stepLog.entries.splice(entryIndex, 1);
+                renderLog(); // Re-render
+            }
+        }
+
+        function updateLogEntry(stepId, entryIndex, label, value) {
+            const entry = projectLog[stepId]?.entries[entryIndex];
+            if (entry) {
+                entry[label] = value;
+                // Data is saved in the projectLog object, no need to re-render just for a value change
+            }
         }
 
         function toggleDone(id, isChecked) {
-            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            projectLog[id] = projectLog[id] || { done: false, date: '', entries: [] };
             projectLog[id].done = isChecked;
             if (isChecked && !projectLog[id].date) {
                 // Set today's date if marked done but no date exists
@@ -591,7 +857,7 @@
         }
 
         function updateDate(id, dateValue) {
-            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            projectLog[id] = projectLog[id] || { done: false, date: '', entries: [] };
             projectLog[id].date = dateValue;
             if (dateValue && !projectLog[id].done) {
                 // Mark done if a date is manually entered
@@ -600,30 +866,234 @@
             renderLog();
         }
 
-        // isButtonCall is true when called by the 'Record Harvest' button
-        function saveLog(id, isButtonCall = false) {
-            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+
+        // --- REPORTING LOGIC ---
+        function renderReport(isRefresh = false) {
+            if (!isRefresh && Object.keys(projectLog).length === 0) {
+                // Only show placeholder if not a manual refresh AND there is no data
+                reportOutput.innerHTML = `<p class="text-gray-500 italic">Click "Refresh Report" to see your project data.</p>`;
+                return;
+            }
+
+            // Calculations
+            const mothers = projectLog['start_mother']?.entries || [];
+            const slipsCut = projectLog['cut_slips']?.entries || [];
+            const slipsRooted = projectLog['root_slips']?.entries || [];
+            const slipsPlanted = projectLog['plant_field']?.entries || [];
+            const soilTests = projectLog['soil_prep']?.entries || [];
+            const pestSightings = projectLog['scouting_start']?.entries || []; // Corrected ID
+            const harvests = projectLog['harvest']?.entries || [];
+            const sales = projectLog['sale']?.entries || []; // NEW: Get sales data
+
+            // Totals
+            const totalMothers = mothers.length;
+            const totalSlipsCut = slipsCut.reduce((sum, entry) => sum + (parseFloat(entry['Slips Cut']) || 0), 0);
+            const totalSlipsRooted = slipsRooted.reduce((sum, entry) => sum + (parseFloat(entry['Slips Put in Water']) || 0), 0);
+            const totalSlipsPlanted = slipsPlanted.reduce((sum, entry) => sum + (parseFloat(entry['Slips Planted']) || 0), 0);
+            const totalHarvestKg = harvests.reduce((sum, entry) => sum + (parseFloat(entry['Total Harvest (Kg)']) || 0), 0);
+            const totalSoldKg = sales.reduce((sum, entry) => sum + (parseFloat(entry['Quantity Sold (Kg)']) || 0), 0); // NEW
+            const totalRevenue = sales.reduce((sum, entry) => { // NEW
+                const qty = parseFloat(entry['Quantity Sold (Kg)']) || 0;
+                const price = parseFloat(entry['Price per Kg ($)']) || 0;
+                return sum + (qty * price);
+            }, 0);
+
+            // Calculate Averages
+            const avgPH = soilTests.length > 0 
+                ? (soilTests.reduce((sum, entry) => sum + (parseFloat(entry['Soil pH']) || 0), 0) / soilTests.length).toFixed(2)
+                : 'N/A';
             
-            if (id === 'harvest') {
-                const dateEl = document.getElementById('harvest-date');
-                const kgEl = document.getElementById('harvest-kg');
+            const avgHarvestPerPlanting = harvests.length > 0
+                ? (totalHarvestKg / harvests.length).toFixed(2)
+                : 'N/A';
+            
+            const avgPricePerKg = totalSoldKg > 0 // NEW
+                ? (totalRevenue / totalSoldKg).toFixed(2)
+                : 'N/A';
+            
+            // Build Report HTML
+            let html = `
+                <h4 class="text-2xl font-bold text-gray-800 mb-4">Project Summary Report</h4>
                 
-                projectLog[id].date = dateEl.value;
-                projectLog[id].values['Total Harvest (Kg)'] = kgEl.value;
-                
-                // If called by button OR if a value has changed
-                if (isButtonCall || dateEl.value || kgEl.value) {
-                    projectLog[id].done = true;
-                    const statusEl = document.getElementById('harvest-status');
-                    statusEl.textContent = `Harvest logged: ${kgEl.value || 'N/A'} kg recorded on ${dateEl.value || 'N/A'}.`;
-                } else if (!dateEl.value && !kgEl.value) {
-                    projectLog[id].done = false;
-                    document.getElementById('harvest-status').textContent = '';
-                }
+                <!-- Summary Metrics -->
+                <div class="report-section bg-gray-50 p-4 rounded-lg mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-totals')" data-controls="report-totals">
+                        <h5 class="text-xl font-semibold text-gray-700">Key Totals</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-totals" class="collapsible-content mt-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-orange-600">${totalMothers}</p>
+                                <p class="text-sm font-medium text-gray-600">Mother Tubers</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-blue-600">${totalSlipsCut}</p>
+                                <p class="text-sm font-medium text-gray-600">Slips Cut</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-green-600">${totalSlipsPlanted}</p>
+                                <p class="text-sm font-medium text-gray-600">Slips Planted</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-yellow-700">${totalHarvestKg.toFixed(1)} Kg</p>
+                                <p class="text-sm font-medium text-gray-600">Total Harvest</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Financial Metrics -->
+                <div class="report-section bg-gray-50 p-4 rounded-lg mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-financials')" data-controls="report-financials">
+                        <h5 class="text-xl font-semibold text-gray-700">Financial Summary</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-financials" class="collapsible-content mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-green-600">$${totalRevenue.toFixed(2)}</p>
+                                <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-green-700">${totalSoldKg.toFixed(1)} Kg</p>
+                                <p class="text-sm font-medium text-gray-600">Total Kg Sold</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-green-800">$${avgPricePerKg}</p>
+                                <p class="text-sm font-medium text-gray-600">Avg. Price / Kg</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propagation Funnel -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-funnel')" data-controls="report-funnel">
+                        <h5 class="text-xl font-semibold text-gray-700">Propagation Funnel</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-funnel" class="collapsible-content mt-4">
+                        <div class="flex flex-col md:flex-row gap-2 text-center items-center">
+                            <div class="p-3 bg-blue-100 rounded-lg">
+                                <p class="text-2xl font-bold">${totalSlipsCut}</p>
+                                <p class="text-sm font-medium">Slips Cut</p>
+                            </div>
+                            <p class="text-2xl font-bold text-gray-400 mx-2">→</p>
+                            <div class="p-3 bg-blue-200 rounded-lg">
+                                <p class="text-2xl font-bold">${totalSlipsRooted}</p>
+                                <p class="text-sm font-medium">Slips Rooted</p>
+                            </div>
+                            <p class="text-2xl font-bold text-gray-400 mx-2">→</p>
+                            <div class="p-3 bg-green-200 rounded-lg">
+                                <p class="text-2xl font-bold">${totalSlipsPlanted}</p>
+                                <p class="text-sm font-medium">Slips Planted</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Harvest Details -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-harvest')" data-controls="report-harvest">
+                        <h5 class="text-xl font-semibold text-gray-700">Harvest Log (Total: ${totalHarvestKg.toFixed(1)} Kg, Avg: ${avgHarvestPerPlanting} Kg/Entry)</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-harvest" class="collapsible-content mt-4">
+                        ${createTableHtml(harvests, ['Harvest Date', 'Field/Bed ID', 'Total Harvest (Kg)'])}
+                    </div>
+                </div>
+
+                <!-- Pest Log -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-pest')" data-controls="report-pest">
+                        <h5 class="text-xl font-semibold text-gray-700">Pest & Disease Log (${pestSightings.length} sightings)</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-pest" class="collapsible-content mt-4">
+                        ${createTableHtml(pestSightings, ['Date Sighted', 'Pest/Disease Name', 'GPS (Lat, Lon)', 'Notes/Action Taken'])}
+                    </div>
+                </div>
+
+                <!-- Soil Tests -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-soil')" data-controls="report-soil">
+                        <h5 class="text-xl font-semibold text-gray-700">Soil Test Log (Avg. pH: ${avgPH})</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-soil" class="collapsible-content mt-4">
+                        ${createTableHtml(soilTests, ['Date Tested', 'Field/Bed ID', 'Soil pH'])}
+                    </div>
+                </div>
+
+                <!-- NEW: Sales Log -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-sales')" data-controls="report-sales">
+                        <h5 class="text-xl font-semibold text-gray-700">Sales Log (Total: $${totalRevenue.toFixed(2)})</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-sales" class="collapsible-content mt-4">
+                        ${createTableHtml(sales, ['Sale Date', 'Quantity Sold (Kg)', 'Price per Kg ($)', 'Customer/Market'])}
+                    </div>
+                </div>
+            `;
+
+            reportOutput.innerHTML = html;
+        }
+
+        function createTableHtml(data, headers) {
+            if (data.length === 0) {
+                return '<p class="text-gray-500 italic">No data logged for this category.</p>';
             }
             
-            // Rerender the log to update UI state
-            renderLog();
+            let table = '<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">';
+            // Header
+            table += '<thead class="bg-gray-50"><tr>';
+            headers.forEach(header => {
+                table += `<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${header}</th>`;
+            });
+            table += '</tr></thead>';
+            
+            // Body
+            table += '<tbody class="bg-white divide-y divide-gray-200">';
+            data.forEach(entry => {
+                table += '<tr>';
+                headers.forEach(header => {
+                    table += `<td class="px-4 py-3 whitespace-nowLrap text-sm text-gray-700">${entry[header] || ''}</td>`;
+                });
+                table += '</tr>';
+            });
+            table += '</tbody></table></div>';
+            return table;
+        }
+
+        function downloadReport() {
+            try {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectLog, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "sweet_potato_log.json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            } catch (error) {
+                console.error("Failed to download JSON:", error);
+                // We can't use alert(), so we'll log to console
+            }
         }
 
 
@@ -637,11 +1107,16 @@
             stepActions.classList.add('hidden');
             plannerTool.classList.add('hidden');
             projectLogTool.classList.add('hidden');
+            reportingTool.classList.add('hidden');
             progressContainer.classList.add('hidden');
             guideFooter.classList.add('hidden');
 
             // Reset button styles
-            toggleGuideBtn.className = togglePlannerBtn.className = toggleLogBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
+            toggleGuideBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
+            togglePlannerBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
+            toggleLogBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
+            toggleReportingBtn.className = 'col-span-3 mt-2 flex-1 btn-tertiary px-4 py-2 rounded-lg font-bold text-sm';
+
 
             // Show active content area and set button style
             if (viewName === 'guide') {
@@ -659,6 +1134,10 @@
                 projectLogTool.classList.remove('hidden');
                 toggleLogBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
                 renderLog();
+            } else if (viewName === 'reporting') {
+                reportingTool.classList.remove('hidden');
+                toggleReportingBtn.className = 'col-span-3 mt-2 flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
+                renderReport(true); // Render report immediately
             }
         }
         
@@ -734,13 +1213,21 @@
         toggleGuideBtn.addEventListener('click', () => setView('guide'));
         togglePlannerBtn.addEventListener('click', () => setView('planner'));
         toggleLogBtn.addEventListener('click', () => setView('log'));
-
+        toggleReportingBtn.addEventListener('click', () => setView('reporting'));
 
         // --- INITIALIZATION ---
         window.onload = () => {
             setView('guide'); // Start on the guide page
+            // Add listener for download button
+            // We must add it here because the button is part of the reporting-tool div
+            const downloadBtn = document.getElementById('download-json-btn');
+            if(downloadBtn) {
+                downloadBtn.addEventListener('click', downloadReport);
+            }
         };
         
     </script>
 </body>
 </html>
+
+

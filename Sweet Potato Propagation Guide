@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Potato Farmer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles for Cartoon Look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        :root {
+            --color-primary: #D35400; /* Darker Orange/Terra Cotta */
+            --color-secondary: #F1C40F; /* Sunflower Yellow */
+            --color-accent: #27AE60; /* Emerald Green */
+            --color-bg: #ECF0F1; /* Light Gray/Cloud */
+        }
+        body {
+            background-color: var(--color-bg);
+            font-family: 'Inter', sans-serif;
+        }
+        .guide-card {
+            box-shadow: 12px 12px 0px var(--color-accent);
+            border: 5px solid var(--color-accent);
+        }
+        .btn-primary {
+            background-color: var(--color-primary);
+            border: 3px solid #A04000;
+            color: white;
+            transition: all 0.1s ease-in-out;
+            box-shadow: 4px 4px 0px #A04000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px #A04000;
+        }
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #A04000;
+        }
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            border: 3px solid #B7950B;
+            color: #333;
+            transition: all 0.1s ease-in-out;
+            box-shadow: 4px 4px 0px #B7950B;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px #B7950B;
+        }
+        .btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #B7950B;
+        }
+        .step-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Custom Colors for Activity Types */
+        .color-green { border-color: #27AE60; background-color: #E8F5E9; } /* Planting */
+        .color-orange { border-color: #FF9800; background-color: #FFF3E0; } /* Sprouting/Curing */
+        .color-blue { border-color: #2196F3; background-color: #E3F2FD; } /* Rooting/Water */
+        .color-brown { border-color: #795548; background-color: #EFEBE9; } /* Harvesting */
+        .color-gray { border-color: #9E9E9E; background-color: #FAFAFA; } /* Storage/Sale */
+
+        .activity-log-card {
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+        .link-btn {
+            background-color: #E0E7FF;
+            color: #3B82F6;
+            border: 1px solid #93C5FD;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.1s;
+        }
+        .link-btn:hover {
+            background-color: #C7D2FE;
+        }
+    </style>
+</head>
+<body class="p-4 flex items-start justify-center min-h-screen pt-8">
+
+    <!-- Main Guide Card -->
+    <div id="guide-card" class="guide-card max-w-2xl w-full bg-white rounded-xl p-6 md:p-8">
+
+        <!-- Title and Progress -->
+        <header class="mb-6">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 text-center mb-1">
+                Sweet Potato Farmer's Plan 🍠
+            </h1>
+            <p class="text-center text-gray-500 font-medium mb-4">
+                Smart Steps for Growing, Tracking, and Selling (11 Phases)
+            </p>
+            
+            <!-- Planner and Log Toggle Tabs -->
+            <div class="flex space-x-2 mb-4">
+                <button id="toggle-guide-btn" class="flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm">
+                    Step-by-Step Guide
+                </button>
+                <button id="toggle-planner-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                    Crop Planner 🗓️
+                </button>
+                <button id="toggle-log-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                    My Project Log ✅
+                </button>
+            </div>
+            
+            <!-- Planner Tool Area (Starts Hidden) -->
+            <div id="planner-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Crop Planting Scheduler <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
+                <p class="text-sm mb-3 text-gray-600">
+                    Choose when you want to plant your slips to calculate key dates based on your local assumptions below.
+                    <span class="font-bold text-red-600">You must set your planting date below to see the schedule!</span>
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 mb-4 items-center">
+                    <label for="planting-date" class="font-semibold text-gray-700 w-full sm:w-auto">My Planting Date (Step 5):</label>
+                    <input type="date" id="planting-date" class="p-2 border rounded-md shadow-inner flex-1 w-full" onchange="calculateAndRenderSchedule()">
+                </div>
+                
+                <h4 class="font-bold text-gray-700 mb-2">Schedule Assumptions (Adjust for your Geography):</h4>
+                <div id="assumption-inputs" class="text-sm bg-white p-4 rounded-md border grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days from Planting to Harvest</span>
+                        <input type="number" id="daysToHarvest" value="120" min="90" max="180" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Key variable based on variety and climate.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days for Slip Rooting (in water)</span>
+                        <input type="number" id="daysPropagation" value="14" min="7" max="30" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Time needed to grow 1-inch roots on slips (Step 3).</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days for Mother Sprouting</span>
+                        <input type="number" id="daysMotherStart" value="35" min="20" max="60" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Time needed for mother potato to produce slips (Step 1-2).</p>
+                    </label>
+                    
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days for Field Preparation</span>
+                        <input type="number" id="daysPrePlantingPrep" value="7" min="1" max="14" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Time needed for soil testing and mounding (Step 4).</p>
+                    </label>
+                </div>
+
+                <div id="calendar-output" class="mt-4 space-y-3 p-3 bg-white rounded-lg border">
+                    <p class="text-gray-500 italic" id="planner-placeholder">
+                        Enter a planting date above to see your full schedule.
+                    </p>
+                    <!-- Calendar links will be inserted here -->
+                </div>
+
+                <button id="add-all-btn" class="btn-primary w-full mt-4 px-6 py-2 rounded-lg font-bold text-sm hidden">
+                    + Add ALL Events to Google Calendar
+                </button>
+            </div>
+
+            <!-- Project Log Area (Starts Hidden) -->
+            <div id="project-log-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                <h3 class="text-xl font-bold mb-4 text-gray-700">My Project Activity Log <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
+                
+                <p class="text-sm text-gray-600 mb-4">Use this log to mark steps complete, record the date you did them, and track metrics like soil pH or kilograms harvested.</p>
+
+                <div id="log-entries" class="space-y-4">
+                    <!-- Log fields for each step will be inserted here -->
+                </div>
+
+                <div id="harvest-metrics" class="mt-6 p-4 activity-log-card bg-white rounded-lg">
+                    <h4 class="font-bold text-gray-700 mb-2">Harvest Results (Step 8)</h4>
+                    <label for="harvest-date" class="block text-sm font-medium text-gray-700">Actual Harvest Date:</label>
+                    <input type="date" id="harvest-date" onchange="saveLog('harvest')" class="p-2 border rounded-md shadow-inner w-full mb-3">
+
+                    <label for="harvest-kg" class="block text-sm font-medium text-gray-700">Total Harvest (Kg):</label>
+                    <input type="number" id="harvest-kg" onchange="saveLog('harvest')" placeholder="e.g., 25.5" class="p-2 border rounded-md shadow-inner w-full mb-3">
+
+                    <button onclick="saveLog('harvest', true)" class="w-full btn-primary py-2 text-sm rounded-lg">Record Harvest</button>
+                    <p id="harvest-status" class="text-xs text-green-600 mt-2"></p>
+                </div>
+            </div>
+
+            <!-- Progress Bar (Only visible with Guide) -->
+            <div id="progress-container" class="mt-6">
+                <p id="progress-text" class="text-sm text-center text-gray-600 font-medium mb-1"></p>
+                <div class="h-3 bg-gray-300 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-3 bg-yellow-500 transition-all duration-500" style="width: 0%;"></div>
+                </div>
+            </div>
+
+        </header>
+
+        <!-- Step Content Area (Only visible with Guide) -->
+        <div id="content-area" class="step-content">
+            <div id="step-icon" class="text-6xl text-center mb-4 font-extrabold text-gray-800"></div>
+            <h2 id="step-title" class="text-2xl font-bold text-gray-700 mb-3 text-center"></h2>
+            <p id="step-description" class="text-gray-600 text-lg leading-relaxed"></p>
+            <div id="step-actions" class="mt-4 text-center"></div>
+        </div>
+
+        <!-- Navigation Buttons (Only visible with Guide) -->
+        <footer id="guide-footer" class="mt-8 flex justify-between gap-4">
+            <button id="prev-btn" class="btn-secondary px-6 py-3 rounded-xl font-bold w-1/2 md:w-auto flex-1" disabled>
+                &larr; Previous
+            </button>
+            <button id="next-btn" class="btn-primary px-6 py-3 rounded-xl font-bold w-1/2 md:w-auto flex-1">
+                Next Step &rarr;
+            </button>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- DATA & ASSUMPTIONS ---
+
+        // Guide Steps (Cleaned up: All LaTeX artifacts removed from descriptions)
+        const steps = [
+            { id: 'start_mother', title: '1. Start the Mother Potato', 
+                description: "Choose a healthy sweet potato. Stick 3 or 4 small sticks (like toothpicks) into the middle. Put the bottom half of the potato in a jar of water and put it in a sunny spot. This is the **Sprouting Phase**.", 
+                visual: "🥔 → 📌 → 💧☀️"
+            },
+            { id: 'cut_slips', title: '2. Master Slip Cutting', 
+                description: "Propagate Many Plants! When a slip is about 4 fingers long (4-6 inches), cut or twist it off the mother potato above the water line. Use the <span class=\"font-bold\">Project Log</span> to track how many slips you cut.", 
+                visual: "🍠🌿 → ✂️ → 🌿" 
+            },
+            { id: 'root_slips', title: '3. Make the Slips Grow Roots', 
+                description: "Put the cut slips into a new jar of clean water, leaf-side up. Change the water every 2 days. Wait until the roots are about 1 inch long. This is the **Rooting Phase**.", 
+                visual: "🌿 → 💧 → 🌱"
+            },
+            { id: 'soil_prep', title: '4. Smart Step: Soil Test & Field Prep', 
+                description: "Before planting, take a soil sample and test the pH (ideally 5.8-6.2). Prepare **raised dirt mounds** about 1-2 steps apart to ensure good drainage. Log your pH reading in the <span class=\"font-bold\">Project Log</span>.", 
+                visual: "🍚 → pH → ⛰️"
+            },
+            { id: 'plant_field', title: '5. Plant in the Soil (Day 0)', 
+                description: "Plant the rooted slips into the mounds, burying the roots and most of the stem. Sweet potatoes need full sun, all day. This begins the **Growing Phase**.", 
+                visual: "🌱 → ⛰️ → 💦"
+            },
+            { id: 'scouting', title: '6. Smart Step: Pest and Disease Scouting', 
+                description: "During the first 60 days of growth, actively scout your field. Check the underside of leaves for insects or signs of disease. Early detection is key! Log any sightings in the <span class=\"font-bold\">Project Log</span>.", 
+                visual: "🔎 → 🌿 → 🐞"
+            },
+            { id: 'manage_vines', title: '7. Care for the Vines (Pruning)', 
+                description: "Water regularly, but let the soil dry out slightly between waterings. If the vines start growing extra roots down into the soil, **cut these extra roots** to force the plant to focus energy on the main tubers.", 
+                visual: "🌿 → ✂️ → 🍠 (BIG)"
+            },
+            { id: 'harvest', title: '8. Know When to Harvest', 
+                description: "Tubers are ready 90 to 180 days after planting, signaled when vines turn yellow and die back. Dig carefully and remember to log your **Total Harvest (Kg)** in the <span class=\"font-bold\">Project Log</span>!", 
+                visual: "🍂 → ⛏️ → 🧺"
+            },
+            { id: 'cure', title: '9. Curing for Sweetness', 
+                description: "Gently brush off dirt (do NOT wash). Cure them in a warm, dry, dark room (around 75-85°F) for 10 days. This heals cuts and turns starch to sugar.", 
+                visual: "🍠 → 🔥🔒 → 🍬"
+            },
+            { id: 'storage', title: '10. Storage for Later', 
+                description: "Move cured potatoes to a cool, dry place (55-60°F), dark and well-ventilated. Properly stored sweet potatoes can last up to a year!", 
+                visual: "🍬 → 📦 → ❄️"
+            },
+            { id: 'sale', title: '11. Selling Your Crop', 
+                description: "Sort potatoes by size and quality. Use health facts (Vitamin A!) to market your crop effectively.", 
+                visual: "🍠 → 🏷️ → 🤝"
+            }
+        ];
+
+        // Base Schedule Definitions (used for log fields and relative step ordering)
+        const baseSchedule = [
+            { id: 'start_mother', step: 1, activity: 'Start Mother Tuber', color: 'orange', durationKey: 'daysMotherStart', icon: '💧', phase: 'Sprouting', logFields: [{ label: 'Mother Potatoes Started', unit: 'potatoes' }], details: 'Place mother potato in water to begin slip production.' },
+            { id: 'root_slips', step: 3, activity: 'Start Rooting Slips', color: 'blue', durationKey: 'daysPropagation', icon: '✂️', phase: 'Rooting', logFields: [{ label: 'Slips Cut', unit: 'slips' }], details: 'Cut slips and place them in water to grow roots.' },
+            { id: 'soil_prep', step: 4, activity: 'Soil Test & Field Prep', color: 'gray', durationKey: 'daysPrePlantingPrep', icon: '⛰️', phase: 'Field Prep', logFields: [{ label: 'Soil pH Reading', unit: 'pH' }], details: 'Test soil pH and prepare mounds for planting.' },
+            { id: 'plant_field', step: 5, activity: 'Plant Slips in Field (Day 0)', color: 'green', durationKey: 'daysToHarvest', icon: '🌱', phase: 'Growing', logFields: [{ label: 'Slips Planted', unit: 'slips' }], details: 'Plant rooted slips in warm, mounded soil.' },
+            { id: 'scouting_start', step: 6, activity: 'Pest/Disease Scouting', color: 'blue', fixedStartDays: 30, durationDays: 60, icon: '🔎', phase: 'Monitoring', logFields: [{ label: 'Pest Sightings', unit: 'count' }], details: 'Active monitoring period for pests and disease (Days 30-90).' },
+            { id: 'harvest', step: 8, activity: 'Harvest Tubers', color: 'brown', offsetKey: 'daysToHarvest', durationDays: 0, icon: '🧺', phase: 'Harvesting', logFields: [], details: 'Dig tubers when vines die back. Log your harvest metrics.' }, 
+            { id: 'cure', step: 9, activity: 'Start Curing', color: 'orange', offsetKey: 'daysToHarvest', durationDays: 10, icon: '🔥', phase: 'Curing', logFields: [], details: 'Cure potatoes for 10 days in a warm, dark place to sweeten and heal skin.' },
+            { id: 'storage', step: 10, activity: 'Begin Storage/Sale', color: 'gray', offsetKey: 'daysToHarvest', durationDays: 10, fixedEndOffset: 10, icon: '📦', phase: 'Storage', logFields: [], details: 'Move cured potatoes to cool, dry storage (55-60°F).' },
+        ];
+
+
+        // --- DOM ELEMENT REFERENCES ---
+        const contentArea = document.getElementById('content-area');
+        const stepIcon = document.getElementById('step-icon');
+        const stepTitle = document.getElementById('step-title');
+        const stepDescription = document.getElementById('step-description');
+        const stepActions = document.getElementById('step-actions');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const plannerTool = document.getElementById('planner-tool');
+        const projectLogTool = document.getElementById('project-log-tool');
+        const progressContainer = document.getElementById('progress-container');
+        const guideFooter = document.getElementById('guide-footer');
+
+        const toggleGuideBtn = document.getElementById('toggle-guide-btn');
+        const togglePlannerBtn = document.getElementById('toggle-planner-btn');
+        const toggleLogBtn = document.getElementById('toggle-log-btn');
+
+        const plantingDateInput = document.getElementById('planting-date');
+        const calendarOutput = document.getElementById('calendar-output');
+        const assumptionInputs = document.getElementById('assumption-inputs');
+        const addAllBtn = document.getElementById('add-all-btn');
+        
+        const logEntriesContainer = document.getElementById('log-entries');
+
+
+        // --- STATE & UTILITIES ---
+        let currentStep = 0;
+        let activeView = 'guide'; // 'guide', 'planner', 'log'
+        // Simple in-memory storage for logs
+        let projectLog = {}; 
+        
+        const COLORS = {
+            'orange': 'border-orange-500 bg-orange-100',
+            'blue': 'border-blue-500 bg-blue-100',
+            'green': 'border-green-500 bg-green-100',
+            'brown': 'border-amber-700 bg-amber-100',
+            'red': 'border-red-500 bg-red-100',
+            'gray': 'border-gray-500 bg-gray-100',
+        };
+
+        // Helper: Format date as YYYYMMDD for Google Calendar
+        function formatDateForGoogle(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}${m}${d}`;
+        }
+
+        // Helper: Get Google Calendar URL for a single event
+        function getGoogleCalendarUrl(startDate, activity, details, durationDays = 1, stepNumber) {
+            const startStr = formatDateForGoogle(startDate);
+            const endDate = new Date(startDate);
+            // Google Calendar requires a date range (start day / end day)
+            endDate.setDate(startDate.getDate() + durationDays);
+            const endStr = formatDateForGoogle(endDate);
+            
+            const title = `Sweet Potato: ${activity}`;
+
+            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            const text = encodeURIComponent(title);
+            const dates = `${startStr}/${endStr}`;
+            const detailsText = encodeURIComponent(details + ` (Reference Guide Step ${stepNumber})`);
+
+            return `${baseUrl}&text=${text}&dates=${dates}&details=${detailsText}`;
+        }
+
+        // Helper: Get Google Calendar URL for ALL events (iCal/Web Cal)
+        function getBulkCalendarUrl(events) {
+            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            let bulkTitle = "Sweet Potato Full Project Plan";
+            let bulkDetails = "Your full scheduled plan, calculated based on your Planting Date:\n";
+
+            events.forEach((event, index) => {
+                // Ensure eventDate is a date object
+                const readableDate = new Date(event.startDate).toDateString();
+
+                bulkDetails += `\n${index + 1}. ${event.activity}: ${readableDate}. Duration: ${event.durationDays ? event.durationDays + ' days' : '1 day'}.`;
+            });
+
+            // For simplicity, we create a single "Project Start" event with all dates in the details
+            const today = new Date();
+            const startStr = formatDateForGoogle(today);
+            const endStr = formatDateForGoogle(today);
+            
+            const text = encodeURIComponent(bulkTitle);
+            const dates = `${startStr}/${endStr}`;
+            const detailsText = encodeURIComponent(bulkDetails);
+
+            return `${baseUrl}&text=${text}&dates=${dates}&details=${detailsText}`;
+        }
+
+        // Helper to safely get value from assumption inputs
+        const getAssumptionValue = (id) => {
+            return parseFloat(document.getElementById(id)?.value) || 0;
+        };
+
+        // --- SCHEDULING LOGIC (DYNAMICALLY GENERATED) ---
+        
+        function getDynamicSchedule() {
+            const daysToHarvest = getAssumptionValue('daysToHarvest');
+            const daysPropagation = getAssumptionValue('daysPropagation');
+            const daysMotherStart = getAssumptionValue('daysMotherStart');
+            const daysPrePlantingPrep = getAssumptionValue('daysPrePlantingPrep');
+            
+            // Calculate offsets based on user inputs
+            const scheduleOffsets = {
+                // Pre-Planting (offsets are calculated backward from Day 0 Planting)
+                'start_mother': -(daysMotherStart + daysPropagation),
+                'root_slips': -daysPropagation,
+                'soil_prep': -daysPrePlantingPrep,
+                
+                // Growing Phase (Day 0 Planting)
+                'plant_field': 0,
+                'scouting_start': 30, // Fixed start day after planting
+                
+                // Post-Planting (offsets are calculated forward from Day 0 Planting)
+                'harvest': daysToHarvest,
+                'cure': daysToHarvest, // Curing starts on harvest day
+                'storage': daysToHarvest + 10, // Storage starts 10 days after harvest/curing starts
+            };
+
+            const dynamicSchedule = baseSchedule.map(event => {
+                let offset = scheduleOffsets[event.id] || 0;
+                let duration = event.durationDays;
+                
+                // Special Duration Overrides (if defined by user inputs)
+                if (event.durationKey === 'daysMotherStart') duration = daysMotherStart;
+                if (event.durationKey === 'daysPropagation') duration = daysPropagation;
+                if (event.durationKey === 'daysPrePlantingPrep') duration = daysPrePlantingPrep;
+                if (event.durationKey === 'daysToHarvest') duration = daysToHarvest;
+                
+                // Special case for scouting, which has fixed days in the baseSchedule definition
+                if (event.id === 'scouting_start') duration = event.durationDays; 
+
+                return {
+                    ...event,
+                    offsetDays: offset,
+                    durationDays: duration
+                };
+            }).sort((a, b) => a.offsetDays - b.offsetDays); // Sort by calculated offset
+
+            return dynamicSchedule;
+        }
+
+        function calculateAndRenderSchedule() {
+            const plantingDateStr = plantingDateInput.value;
+            if (!plantingDateStr) {
+                calendarOutput.innerHTML = `<p class="text-gray-500 italic" id="planner-placeholder">
+                    Enter a planting date above to see your full schedule.
+                </p>`;
+                addAllBtn.classList.add('hidden');
+                return;
+            }
+
+            const plantingDate = new Date(plantingDateStr);
+            // Ensure plantingDate is treated as the start of Day 0 in a fixed time context
+            plantingDate.setUTCHours(0, 0, 0, 0); 
+            
+            const dynamicSchedule = getDynamicSchedule();
+            let html = '<ul class="space-y-4">';
+            let prevDate = null;
+            let eventsWithDates = [];
+
+            dynamicSchedule.forEach((event, index) => {
+                const eventDate = new Date(plantingDate);
+                eventDate.setDate(plantingDate.getDate() + event.offsetDays);
+                const readableDate = eventDate.toDateString();
+                
+                // Calculate days from previous event (only used for display, not logic)
+                let daysDifference = '';
+                if (prevDate) {
+                    const diffTime = Math.abs(eventDate.getTime() - prevDate.getTime());
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays > 0) {
+                        daysDifference = `<span class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full ml-3">Wait ${diffDays} days from previous step</span>`;
+                    }
+                }
+                prevDate = eventDate;
+
+                // Duration for Calendar is at least 1 day
+                const duration = event.durationDays > 0 ? event.durationDays : 1; 
+
+                const calendarUrl = getGoogleCalendarUrl(eventDate, event.activity, event.details, duration, event.step);
+                const colorClass = COLORS[event.color] || 'border-gray-500 bg-gray-100';
+
+                // Store event with calculated date for the bulk calendar link
+                eventsWithDates.push({ ...event, startDate: eventDate, durationDays: duration });
+
+                html += `
+                    <li class="p-3 border-l-4 ${colorClass} rounded-md">
+                        <div class="flex items-center justify-between">
+                            <p class="font-bold text-lg text-gray-800 flex items-center">
+                                ${event.icon} ${event.activity}
+                            </p>
+                            ${daysDifference}
+                        </div>
+                        <p class="text-sm text-gray-700 mt-1">
+                            Date: <span class="font-semibold">${readableDate}</span>
+                            <span class="ml-4 text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">Phase: ${event.phase}</span>
+                            <span class="ml-2 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full">${event.durationDays > 0 ? event.durationDays + ' Day Duration' : 'Single Day Event'}</span>
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">
+                            <span class="font-medium">Details:</span> ${event.details}
+                        </p>
+                        <a href="${calendarUrl}" target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:text-blue-800 transition duration-150">
+                            + Add Single Event to Calendar
+                        </a>
+                    </li>
+                `;
+            });
+
+            html += '</ul>';
+            calendarOutput.innerHTML = html;
+            
+            // Update the Add All button event handler with the calculated dates
+            addAllBtn.onclick = () => {
+                window.open(getBulkCalendarUrl(eventsWithDates), '_blank');
+            };
+            addAllBtn.classList.remove('hidden');
+        }
+
+        // --- ACTIVITY LOG LOGIC ---
+        
+        function updateLogValues(id, label, value) {
+            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            projectLog[id].values[label] = value;
+            // Re-render to show updated status if required
+            const statusElement = document.getElementById(`${id}-status`);
+            if (statusElement) {
+                 statusElement.textContent = `Metrics updated.`;
+            }
+        }
+
+        function renderLog() {
+            let html = '';
+            steps.forEach((step, index) => {
+                // Find corresponding schedule data for log fields
+                const logData = baseSchedule.find(d => d.step === index + 1);
+                
+                // Skip steps 9-11 as they are post-harvest or conceptual, and 8 is handled in harvest-metrics
+                if (step.id === 'cure' || step.id === 'storage' || step.id === 'sale' || step.id === 'harvest') return; 
+
+                const stepLog = projectLog[step.id] || { done: false, date: '', values: {} };
+                
+                let valueInputs = '';
+                if (logData && logData.logFields) {
+                    logData.logFields.forEach(field => {
+                        const currentValue = stepLog.values[field.label] || '';
+                        valueInputs += `
+                            <label for="${step.id}-${field.label}" class="block text-sm font-medium text-gray-700 mt-1">${field.label} (${field.unit}):</label>
+                            <input type="${field.unit === 'pH' ? 'number' : 'number'}" 
+                                id="${step.id}-${field.label}" 
+                                value="${currentValue}" 
+                                onchange="updateLogValues('${step.id}', '${field.label}', this.value)"
+                                placeholder="Enter ${field.label}" 
+                                class="p-2 border rounded-md shadow-inner w-full mb-2 text-sm">
+                        `;
+                    });
+                }
+                
+                html += `
+                    <div class="p-4 activity-log-card bg-white rounded-lg border-l-4 ${stepLog.done ? 'border-green-600' : 'border-gray-300'}">
+                        <div class="flex items-center justify-between">
+                            <p class="font-bold text-gray-700">${step.visual.replace(/→/g, '→')} Step ${index + 1}: ${step.title}</p>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" ${stepLog.done ? 'checked' : ''} onchange="toggleDone('${step.id}', this.checked)" class="h-5 w-5 text-green-600 rounded">
+                                <span class="text-sm font-medium text-gray-600">Done</span>
+                            </label>
+                        </div>
+                        
+                        <label for="${step.id}-date" class="block text-sm font-medium text-gray-700 mt-2">Actual Completion Date:</label>
+                        <input type="date" id="${step.id}-date" value="${stepLog.date}" onchange="updateDate('${step.id}', this.value)" class="p-2 border rounded-md shadow-inner w-full mb-3 text-sm">
+                        
+                        ${valueInputs}
+                        <p id="${step.id}-status" class="text-xs text-green-600 mt-2 font-medium"></p>
+                    </div>
+                `;
+            });
+
+            logEntriesContainer.innerHTML = html;
+
+            // Re-render Harvest Metrics separately (Step 8)
+            const harvestLog = projectLog['harvest'] || { date: '', values: {} };
+            document.getElementById('harvest-date').value = harvestLog.date || '';
+            document.getElementById('harvest-kg').value = harvestLog.values['Total Harvest (Kg)'] || '';
+
+            // Update status messages after rendering (important for dynamic content)
+            for (const key in projectLog) {
+                const statusElement = document.getElementById(`${key}-status`);
+                if (statusElement && projectLog[key].done) {
+                    const dateText = projectLog[key].date || 'N/A';
+                    statusElement.textContent = `Completed on: ${dateText}.`;
+                    
+                    if (projectLog[key].values && Object.keys(projectLog[key].values).length > 0) {
+                        statusElement.textContent += ' Metrics logged.';
+                    }
+                }
+            }
+            
+        }
+
+        function toggleDone(id, isChecked) {
+            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            projectLog[id].done = isChecked;
+            if (isChecked && !projectLog[id].date) {
+                // Set today's date if marked done but no date exists
+                projectLog[id].date = new Date().toISOString().substring(0, 10);
+            } 
+            renderLog();
+        }
+
+        function updateDate(id, dateValue) {
+            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            projectLog[id].date = dateValue;
+            if (dateValue && !projectLog[id].done) {
+                // Mark done if a date is manually entered
+                projectLog[id].done = true;
+            } 
+            renderLog();
+        }
+
+        // isButtonCall is true when called by the 'Record Harvest' button
+        function saveLog(id, isButtonCall = false) {
+            projectLog[id] = projectLog[id] || { done: false, date: '', values: {} };
+            
+            if (id === 'harvest') {
+                const dateEl = document.getElementById('harvest-date');
+                const kgEl = document.getElementById('harvest-kg');
+                
+                projectLog[id].date = dateEl.value;
+                projectLog[id].values['Total Harvest (Kg)'] = kgEl.value;
+                
+                // If called by button OR if a value has changed
+                if (isButtonCall || dateEl.value || kgEl.value) {
+                    projectLog[id].done = true;
+                    const statusEl = document.getElementById('harvest-status');
+                    statusEl.textContent = `Harvest logged: ${kgEl.value || 'N/A'} kg recorded on ${dateEl.value || 'N/A'}.`;
+                } else if (!dateEl.value && !kgEl.value) {
+                    projectLog[id].done = false;
+                    document.getElementById('harvest-status').textContent = '';
+                }
+            }
+            
+            // Rerender the log to update UI state
+            renderLog();
+        }
+
+
+        // --- UI VIEW MANAGEMENT ---
+
+        function setView(viewName) {
+            activeView = viewName;
+
+            // Hide all content areas
+            contentArea.classList.add('hidden');
+            stepActions.classList.add('hidden');
+            plannerTool.classList.add('hidden');
+            projectLogTool.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            guideFooter.classList.add('hidden');
+
+            // Reset button styles
+            toggleGuideBtn.className = togglePlannerBtn.className = toggleLogBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
+
+            // Show active content area and set button style
+            if (viewName === 'guide') {
+                contentArea.classList.remove('hidden');
+                progressContainer.classList.remove('hidden');
+                guideFooter.classList.remove('hidden');
+                stepActions.classList.remove('hidden');
+                toggleGuideBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
+                renderStep();
+            } else if (viewName === 'planner') {
+                plannerTool.classList.remove('hidden');
+                togglePlannerBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
+                calculateAndRenderSchedule();
+            } else if (viewName === 'log') {
+                projectLogTool.classList.remove('hidden');
+                toggleLogBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
+                renderLog();
+            }
+        }
+        
+        // --- GUIDE RENDERING LOGIC ---
+
+        function renderStep() {
+            contentArea.style.opacity = '0';
+            setTimeout(() => {
+                const step = steps[currentStep];
+                const stepNum = currentStep + 1;
+                
+                // Render the clean visual symbols
+                stepIcon.innerHTML = `<p class="text-5xl font-extrabold text-gray-800">${step.visual.replace(/→/g, '<span class="text-4xl mx-2 text-orange-500">→</span>')}</p>`;
+                
+                stepTitle.textContent = step.title;
+                
+                // Directly set the description (now that the source data is clean)
+                stepDescription.innerHTML = `<p class="mb-3">${step.description.replace(/\n\n/g, '</p><p class="mb-3">')}</p>`;
+                
+                // Render Action Buttons
+                stepActions.innerHTML = `
+                    <button onclick="setView('planner')" class="link-btn mr-3">
+                        View Date in Planner
+                    </button>
+                    <button onclick="setView('log')" class="link-btn">
+                        Log Step ${stepNum} Completion
+                    </button>
+                `;
+
+                const progressPercentage = (stepNum / steps.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+                progressText.textContent = `Guide Step ${stepNum} of ${steps.length}`;
+
+                prevBtn.disabled = currentStep === 0;
+                prevBtn.classList.toggle('opacity-50', currentStep === 0);
+
+                if (currentStep === steps.length - 1) {
+                    nextBtn.textContent = 'Guide Complete! 🎉';
+                    nextBtn.classList.remove('btn-primary');
+                    nextBtn.classList.add('btn-secondary');
+                } else {
+                    nextBtn.textContent = 'Next Step →';
+                    nextBtn.classList.remove('btn-secondary');
+                    nextBtn.classList.add('btn-primary');
+                }
+
+                contentArea.style.opacity = '1';
+            }, 300);
+        }
+
+        // --- NAVIGATION HANDLERS ---
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                renderStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+
+        // Navigation
+        prevBtn.addEventListener('click', prevStep);
+        nextBtn.addEventListener('click', nextStep);
+        
+        // View Toggles
+        toggleGuideBtn.addEventListener('click', () => setView('guide'));
+        togglePlannerBtn.addEventListener('click', () => setView('planner'));
+        toggleLogBtn.addEventListener('click', () => setView('log'));
+
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            setView('guide'); // Start on the guide page
+        };
+        
+    </script>
+</body>
+</html>

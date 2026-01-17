@@ -6,96 +6,484 @@
     <title>Sweet Potato Farming and Tracking Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Styles for Cartoon Look (Restored from V1) */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        /* Custom Styles: Field Almanac UI */
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
         :root {
-            --color-primary: #D35400; /* Darker Orange/Terra Cotta */
-            --color-secondary: #F1C40F; /* Sunflower Yellow */
-            --color-accent: #27AE60; /* Emerald Green */
-            --color-bg: #ECF0F1; /* Light Gray/Cloud */
+            --font-display: 'Fraunces', serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --color-ink: #2a241c;
+            --color-primary: #d45b2b;
+            --color-primary-dark: #b3471f;
+            --color-secondary: #f1c453;
+            --color-secondary-dark: #c99e39;
+            --color-tertiary: #2a7d73;
+            --color-tertiary-dark: #1f5f58;
+            --color-accent: #3f7c4b;
+            --color-accent-dark: #2f5f39;
+            --color-card: #fffaf2;
+            --color-bg: #f4efe5;
+            --color-muted: #6b655d;
+            --shadow-strong: 12px 12px 0 rgba(33, 30, 24, 0.14);
+            --shadow-soft: 4px 4px 0 rgba(33, 30, 24, 0.12);
+            --radius-lg: 18px;
+            --radius-md: 12px;
+        }
+        * {
+            box-sizing: border-box;
         }
         body {
-            background-color: var(--color-bg);
-            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at top left, #fff4d8 0%, rgba(255, 244, 216, 0) 45%),
+                radial-gradient(circle at 85% 20%, #e7f4ea 0%, rgba(231, 244, 234, 0) 40%),
+                linear-gradient(120deg, #f7efe2 0%, #f3f0e6 45%, #eef4ee 100%);
+            color: var(--color-ink);
+            font-family: var(--font-body);
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(rgba(42, 36, 28, 0.08) 1px, transparent 0),
+                radial-gradient(rgba(42, 36, 28, 0.04) 1px, transparent 0);
+            background-size: 28px 28px, 6px 6px;
+            background-position: 0 0, 12px 12px;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        h1, h2, h3, h4, h5 {
+            font-family: var(--font-display);
+            letter-spacing: -0.01em;
         }
         .guide-card {
-            box-shadow: 12px 12px 0px var(--color-accent);
-            border: 5px solid var(--color-accent);
+            background: linear-gradient(180deg, #fffdf7 0%, #fff5e8 100%);
+            border: 4px solid var(--color-ink);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+            animation: rise-in 0.6s ease-out;
         }
-        .btn-primary {
-            background-color: var(--color-primary);
-            border: 3px solid #A04000;
-            color: white;
-            transition: all 0.1s ease-in-out;
-            box-shadow: 4px 4px 0px #A04000;
+        .guide-card::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 2px dashed rgba(42, 36, 28, 0.08);
+            border-radius: calc(var(--radius-lg) - 10px);
+            pointer-events: none;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 6px 6px 0px #A04000;
+        .header-stack > * {
+            animation: rise-in 0.6s ease-out both;
         }
-        .btn-primary:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px #A04000;
+        .header-stack > *:nth-child(1) { animation-delay: 0.05s; }
+        .header-stack > *:nth-child(2) { animation-delay: 0.1s; }
+        .header-stack > *:nth-child(3) { animation-delay: 0.15s; }
+        .header-stack > *:nth-child(4) { animation-delay: 0.2s; }
+        @keyframes rise-in {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .tab-btn {
+            width: 100%;
+            border-radius: 14px;
+            border: 2px solid rgba(42, 36, 28, 0.2);
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--color-ink);
+            font-size: 0.875rem;
+            font-weight: 700;
+            padding: 0.6rem 1rem;
+            box-shadow: 2px 2px 0 rgba(42, 36, 28, 0.15);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+        }
+        .tab-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 3px 3px 0 rgba(42, 36, 28, 0.2);
+        }
+        .tab-btn.is-active {
+            background: var(--color-primary);
+            border-color: var(--color-primary-dark);
+            color: #fff7f0;
+            box-shadow: 4px 4px 0 var(--color-primary-dark);
+        }
+        .tab-btn[data-accent="sun"].is-active {
+            background: var(--color-secondary);
+            border-color: var(--color-secondary-dark);
+            color: #3b2a14;
+        }
+        .tab-btn[data-accent="leaf"].is-active {
+            background: var(--color-accent);
+            border-color: var(--color-accent-dark);
+            color: #ecfff1;
+        }
+        .tab-btn[data-accent="river"].is-active {
+            background: var(--color-tertiary);
+            border-color: var(--color-tertiary-dark);
+            color: #e9fffb;
+        }
+        .btn-primary,
+        .btn-secondary,
+        .btn-tertiary {
+            --btn-bg: var(--color-primary);
+            --btn-shadow: var(--color-primary-dark);
+            --btn-color: #fff7f0;
+            background-color: var(--btn-bg);
+            border: 3px solid var(--btn-shadow);
+            color: var(--btn-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+            box-shadow: 4px 4px 0 var(--btn-shadow);
         }
         .btn-secondary {
-            background-color: var(--color-secondary);
-            border: 3px solid #B7950B;
-            color: #333;
-            transition: all 0.1s ease-in-out;
-            box-shadow: 4px 4px 0px #B7950B;
+            --btn-bg: var(--color-secondary);
+            --btn-shadow: var(--color-secondary-dark);
+            --btn-color: #3b2a14;
         }
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 6px 6px 0px #B7950B;
-        }
-        .btn-secondary:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px #B7950B;
-        }
-        /* Added style for the new Reporting button */
         .btn-tertiary {
-            background-color: #e0e7ff;
-            border: 3px solid #a5b4fc;
-            color: #3730a3;
-            transition: all 0.1s ease-in-out;
-            box-shadow: 4px 4px 0px #a5b4fc;
+            --btn-bg: var(--color-tertiary);
+            --btn-shadow: var(--color-tertiary-dark);
+            --btn-color: #e9fffb;
         }
+        .btn-primary:hover,
+        .btn-secondary:hover,
         .btn-tertiary:hover {
             transform: translateY(-2px);
-            box-shadow: 6px 6px 0px #a5b4fc;
+            box-shadow: 6px 6px 0 var(--btn-shadow);
+            filter: saturate(1.05);
         }
+        .btn-primary:active,
+        .btn-secondary:active,
         .btn-tertiary:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px #a5b4fc;
+            transform: translateY(3px);
+            box-shadow: 0 0 0 var(--btn-shadow);
+        }
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        .btn-tertiary:focus-visible,
+        .tab-btn:focus-visible,
+        .link-btn:focus-visible {
+            outline: 3px solid rgba(42, 36, 28, 0.35);
+            outline-offset: 2px;
         }
         .step-content {
             transition: opacity 0.3s ease-in-out;
         }
         /* Custom Colors for Activity Types */
-        .color-green { border-color: #27AE60; background-color: #E8F5E9; } /* Planting */
-        .color-orange { border-color: #FF9800; background-color: #FFF3E0; } /* Sprouting/Curing */
-        .color-blue { border-color: #2196F3; background-color: #E3F2FD; } /* Rooting/Water */
-        .color-brown { border-color: #795548; background-color: #EFEBE9; } /* Harvesting */
-        .color-gray { border-color: #9E9E9E; background-color: #FAFAFA; } /* Storage/Sale */
+        .color-green { border-color: #3f7c4b; background-color: #e7f4ea; }
+        .color-orange { border-color: #d45b2b; background-color: #fde8d8; }
+        .color-blue { border-color: #2a6fb0; background-color: #e2effb; }
+        .color-brown { border-color: #7a4c2b; background-color: #f1e3d7; }
+        .color-gray { border-color: #9c8f7b; background-color: #f3efe8; }
 
+        .tool-panel {
+            background: rgba(255, 248, 235, 0.9);
+            border: 2px solid rgba(42, 36, 28, 0.18);
+            box-shadow: var(--shadow-soft);
+        }
         .activity-log-card {
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-soft);
         }
         .log-entry-card {
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+            box-shadow: 2px 2px 0 rgba(42, 36, 28, 0.08);
         }
         .link-btn {
-            background-color: #E0E7FF;
-            color: #3B82F6;
-            border: 1px solid #93C5FD;
-            padding: 4px 8px;
-            border-radius: 6px;
+            background-color: rgba(42, 36, 28, 0.06);
+            color: var(--color-ink);
+            border: 1px solid rgba(42, 36, 28, 0.2);
+            padding: 4px 10px;
+            border-radius: 999px;
             font-size: 0.875rem;
             font-weight: 600;
-            transition: background-color 0.1s;
+            transition: background-color 0.1s ease, transform 0.1s ease;
         }
         .link-btn:hover {
-            background-color: #C7D2FE;
+            background-color: rgba(42, 36, 28, 0.12);
+            transform: translateY(-1px);
+        }
+        .progress-track {
+            background: linear-gradient(90deg, #f3e3c2, #f5f1e6);
+            border: 2px solid rgba(42, 36, 28, 0.12);
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #f1c453, #d45b2b);
+        }
+        input, textarea, select {
+            background-color: #fff;
+        }
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 3px solid rgba(42, 36, 28, 0.2);
+            outline-offset: 1px;
+        }
+        .calendar-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .calendar-month {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(42, 36, 28, 0.15);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            box-shadow: var(--shadow-soft);
+        }
+        .calendar-month-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.45rem;
+        }
+        .day-name {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-muted);
+            text-align: center;
+            font-weight: 700;
+        }
+        .day-cell {
+            min-height: 92px;
+            background: #fffdf7;
+            border: 1px solid rgba(42, 36, 28, 0.12);
+            border-radius: 10px;
+            padding: 0.35rem 0.45rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .day-cell.is-empty {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+        }
+        .day-cell.is-today {
+            border-color: var(--color-tertiary);
+            box-shadow: 0 0 0 2px rgba(42, 125, 115, 0.18);
+        }
+        .day-cell.is-planting {
+            background: #fff3d6;
+            border-color: var(--color-secondary);
+        }
+        .day-number {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--color-ink);
+        }
+        .event-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .calendar-event {
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            cursor: pointer;
+            text-align: left;
+            appearance: none;
+            background: transparent;
+        }
+        .calendar-more {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--color-muted);
+        }
+        .calendar-event .event-tooltip {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 6px);
+            z-index: 20;
+            min-width: 180px;
+            max-width: 240px;
+            background: #2a241c;
+            color: #fff7f0;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            line-height: 1.35;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            pointer-events: none;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        }
+        .calendar-event .event-tooltip::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 14px;
+            width: 12px;
+            height: 12px;
+            background: #2a241c;
+            transform: rotate(45deg);
+        }
+        .calendar-event:hover .event-tooltip,
+        .calendar-event:focus-visible .event-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .calendar-event.planned {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .calendar-event.completed {
+            color: #fff;
+        }
+        .event-orange {
+            border-color: #d45b2b;
+            color: #7a3418;
+            background: #fde8d8;
+        }
+        .calendar-event.completed.event-orange {
+            background: #d45b2b;
+            color: #fff;
+        }
+        .event-blue {
+            border-color: #2a6fb0;
+            color: #18416c;
+            background: #e2effb;
+        }
+        .calendar-event.completed.event-blue {
+            background: #2a6fb0;
+            color: #fff;
+        }
+        .event-green {
+            border-color: #3f7c4b;
+            color: #264c2f;
+            background: #e7f4ea;
+        }
+        .calendar-event.completed.event-green {
+            background: #3f7c4b;
+            color: #fff;
+        }
+        .event-brown {
+            border-color: #7a4c2b;
+            color: #4a2f1a;
+            background: #f1e3d7;
+        }
+        .calendar-event.completed.event-brown {
+            background: #7a4c2b;
+            color: #fff;
+        }
+        .event-gray {
+            border-color: #9c8f7b;
+            color: #5b5146;
+            background: #f3efe8;
+        }
+        .calendar-event.completed.event-gray {
+            background: #9c8f7b;
+            color: #fff;
+        }
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--color-muted);
+        }
+        .legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(42, 36, 28, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            color: var(--color-ink);
+        }
+        .legend-planned {
+            border-style: dashed;
+        }
+        .legend-completed {
+            background: var(--color-ink);
+            color: #fff;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(42, 36, 28, 0.2);
+            display: inline-block;
+        }
+        .planner-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(42, 36, 28, 0.12);
+            border-radius: 12px;
+            padding: 0.75rem;
+        }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .filter-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--color-muted);
+            margin-right: 0.25rem;
+        }
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(42, 36, 28, 0.2);
+            background: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-ink);
+        }
+        .filter-pill input {
+            accent-color: var(--color-primary);
+        }
+        .calendar-links {
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px dashed rgba(42, 36, 28, 0.2);
+            border-radius: 12px;
+            padding: 0.75rem;
+        }
+        .calendar-links a {
+            display: block;
+            font-size: 0.8rem;
+            color: #1e4b7a;
+            font-weight: 600;
+            margin-top: 0.35rem;
+        }
+        @media (max-width: 640px) {
+            .day-cell {
+                min-height: 80px;
+            }
+            .calendar-event {
+                font-size: 0.62rem;
+            }
         }
         
         /* NEW Styles for Collapsible Sections */
@@ -105,9 +493,10 @@
             max-height: 2000px; /* Set to a large value */
             opacity: 1;
         }
-        .collapsible-content.hidden {
+        .collapsible-content.is-collapsed {
             max-height: 0;
             opacity: 0;
+            margin-top: 0;
         }
         .chevron-icon {
             transition: transform 0.3s ease;
@@ -115,14 +504,24 @@
         .chevron-icon.rotate-180 {
             transform: rotate(180deg);
         }
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
 
         /* Print Styles */
         @media print {
             body {
                 background-color: white;
-                font-family: 'Inter', sans-serif;
+                font-family: var(--font-body);
                 margin: 0;
                 padding: 0;
+            }
+            body::before,
+            .guide-card::after {
+                display: none;
             }
             .guide-card {
                 box-shadow: none;
@@ -130,13 +529,19 @@
                 max-width: 100%;
                 padding: 0;
             }
-            header, #guide-footer, .no-print {
+            #guide-footer, .no-print {
                 display: none;
+            }
+            header > :not(#reporting-tool) {
+                display: none !important;
             }
             #reporting-tool {
                 display: block !important;
                 opacity: 1 !important;
                 visibility: visible !important;
+            }
+            #reporting-tool.hidden {
+                display: block !important;
             }
             .report-section {
                 margin-top: 2rem;
@@ -146,6 +551,11 @@
                 page-break-inside: avoid;
             }
             .collapsible-content {
+                max-height: none !important;
+                opacity: 1 !important;
+                display: block !important;
+            }
+            .collapsible-content.is-collapsed {
                 max-height: none !important;
                 opacity: 1 !important;
                 display: block !important;
@@ -171,10 +581,10 @@
 <body class="p-4 flex items-start justify-center min-h-screen pt-8">
 
     <!-- Main Guide Card -->
-    <div id="guide-card" class="guide-card max-w-2xl w-full bg-white rounded-xl p-6 md:p-8">
+    <div id="guide-card" class="guide-card max-w-3xl w-full p-6 md:p-8">
 
         <!-- Title and Progress -->
-        <header class="mb-6">
+        <header class="mb-6 header-stack">
             <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 text-center mb-1">
                 Sweet Potato Farming and Tracking Guide 🍠
             </h1>
@@ -183,23 +593,23 @@
             </p>
             
             <!-- Planner and Log Toggle Tabs -->
-            <div class="grid grid-cols-3 space-x-2 mb-4">
-                <button id="toggle-guide-btn" class="flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+                <button id="toggle-guide-btn" class="tab-btn" data-view="guide" data-accent="primary" aria-pressed="false">
                     Step-by-Step Guide
                 </button>
-                <button id="toggle-planner-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                <button id="toggle-planner-btn" class="tab-btn" data-view="planner" data-accent="sun" aria-pressed="false">
                     Crop Planner 🗓️
                 </button>
-                <button id="toggle-log-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                <button id="toggle-log-btn" class="tab-btn" data-view="log" data-accent="leaf" aria-pressed="false">
                     My Project Log ✅
                 </button>
-                <button id="toggle-reporting-btn" class="col-span-3 mt-2 flex-1 btn-tertiary px-4 py-2 rounded-lg font-bold text-sm">
+                <button id="toggle-reporting-btn" class="tab-btn sm:col-span-3" data-view="reporting" data-accent="river" aria-pressed="false">
                     Reporting & Analysis 📊
                 </button>
             </div>
             
             <!-- Planner Tool Area (Starts Hidden) -->
-            <div id="planner-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+            <div id="planner-tool" class="tool-panel hidden mt-4 p-4 rounded-lg">
                 <h3 class="text-xl font-bold mb-2 text-gray-700">Crop Planting Scheduler <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
                 <p class="text-sm mb-3 text-gray-600">
                     Choose when you want to plant your slips to calculate key dates based on your local assumptions below.
@@ -246,13 +656,86 @@
                     <!-- Calendar links will be inserted here -->
                 </div>
 
-                <button id="add-all-btn" class="btn-primary w-full mt-4 px-6 py-2 rounded-lg font-bold text-sm hidden">
-                    + Add ALL Events to Google Calendar
-                </button>
+                <div id="planner-actions" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden no-print">
+                    <button id="add-all-btn" class="btn-primary w-full px-6 py-2 rounded-lg font-bold text-sm">
+                        Add All Events to Google Calendar
+                    </button>
+                    <button id="download-ics-btn" class="btn-secondary w-full px-6 py-2 rounded-lg font-bold text-sm">
+                        Download iCal (.ics) for Apple/Google
+                    </button>
+                    <button id="print-calendar-btn" class="btn-tertiary w-full px-6 py-2 rounded-lg font-bold text-sm">
+                        Print / Download Calendar
+                    </button>
+                </div>
+
+                <div id="planner-calendar-wrap" class="mt-6 hidden">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                        <h4 class="text-xl font-bold text-gray-700">Calendar View</h4>
+                        <div class="calendar-legend">
+                            <span class="legend-chip legend-planned">Planned</span>
+                            <span class="legend-chip legend-completed">Completed</span>
+                            <span class="legend-chip"><span class="legend-dot event-orange"></span>Sprouting/Curing</span>
+                            <span class="legend-chip"><span class="legend-dot event-blue"></span>Rooting/Water</span>
+                            <span class="legend-chip"><span class="legend-dot event-green"></span>Planting/Growth</span>
+                            <span class="legend-chip"><span class="legend-dot event-brown"></span>Harvesting</span>
+                            <span class="legend-chip"><span class="legend-dot event-gray"></span>Storage/Sales</span>
+                        </div>
+                    </div>
+                    <div id="planner-filters" class="planner-filters mb-4">
+                        <div class="filter-group">
+                            <span class="filter-title">Show</span>
+                            <label class="filter-pill">
+                                <input type="radio" name="status-filter" value="all" checked>
+                                Both
+                            </label>
+                            <label class="filter-pill">
+                                <input type="radio" name="status-filter" value="planned">
+                                Planned
+                            </label>
+                            <label class="filter-pill">
+                                <input type="radio" name="status-filter" value="completed">
+                                Completed
+                            </label>
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-title">Phase Filters</span>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="sprouting" checked>
+                                Sprouting
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="curing" checked>
+                                Curing
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="slip_rooting" checked>
+                                Slip Rooting
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="slip_planting" checked>
+                                Slip Planting
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="harvesting" checked>
+                                Harvesting
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="storage" checked>
+                                Storage
+                            </label>
+                            <label class="filter-pill">
+                                <input type="checkbox" value="sales" checked>
+                                Sales
+                            </label>
+                        </div>
+                    </div>
+                    <div id="planner-calendar" class="calendar-grid"></div>
+                    <div id="calendar-links-output" class="calendar-links hidden"></div>
+                </div>
             </div>
 
             <!-- Project Log Area (Starts Hidden) -->
-            <div id="project-log-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+            <div id="project-log-tool" class="tool-panel hidden mt-4 p-4 rounded-lg">
                 <h3 class="text-xl font-bold mb-4 text-gray-700">My Project Activity Log <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
                 
                 <p class="text-sm text-gray-600 mb-4">Use this log to mark steps complete, record the date you did them, and add multiple data entries for key metrics. Click a step title to expand or collapse it.</p>
@@ -263,13 +746,13 @@
             </div>
 
             <!-- Reporting Tool Area (Starts Hidden) -->
-            <div id="reporting-tool" class="hidden mt-4 p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+            <div id="reporting-tool" class="tool-panel hidden mt-4 p-4 rounded-lg">
                 <h3 class="text-xl font-bold mb-4 text-gray-700">Reporting & Analysis <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
                 <div class="flex gap-4 mb-4 no-print">
                     <button onclick="renderReport(true)" class="flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm">
                         Refresh Report
                     </button>
-                    <button onclick="window.print()" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
+                    <button onclick="printReport()" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
                         Print Report
                     </button>
                     <button id="download-json-btn" class="flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm">
@@ -285,8 +768,8 @@
             <!-- Progress Bar (Only visible with Guide) -->
             <div id="progress-container" class="mt-6">
                 <p id="progress-text" class="text-sm text-center text-gray-600 font-medium mb-1"></p>
-                <div class="h-3 bg-gray-300 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="h-3 bg-yellow-500 transition-all duration-500" style="width: 0%;"></div>
+                <div class="progress-track h-3 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="progress-fill h-3 transition-all duration-500" style="width: 0%;"></div>
                 </div>
             </div>
 
@@ -479,11 +962,25 @@
         const togglePlannerBtn = document.getElementById('toggle-planner-btn');
         const toggleLogBtn = document.getElementById('toggle-log-btn');
         const toggleReportingBtn = document.getElementById('toggle-reporting-btn');
+        const viewButtons = {
+            guide: toggleGuideBtn,
+            planner: togglePlannerBtn,
+            log: toggleLogBtn,
+            reporting: toggleReportingBtn,
+        };
+        const viewButtonList = Object.values(viewButtons);
 
         const plantingDateInput = document.getElementById('planting-date');
         const calendarOutput = document.getElementById('calendar-output');
         const assumptionInputs = document.getElementById('assumption-inputs');
         const addAllBtn = document.getElementById('add-all-btn');
+        const plannerActions = document.getElementById('planner-actions');
+        const plannerCalendarWrap = document.getElementById('planner-calendar-wrap');
+        const plannerCalendar = document.getElementById('planner-calendar');
+        const downloadIcsBtn = document.getElementById('download-ics-btn');
+        const printCalendarBtn = document.getElementById('print-calendar-btn');
+        const plannerFiltersContainer = document.getElementById('planner-filters');
+        const calendarLinksOutput = document.getElementById('calendar-links-output');
         
         const logEntriesContainer = document.getElementById('log-entries');
 
@@ -491,6 +988,22 @@
         // --- STATE & UTILITIES ---
         let currentStep = 0;
         let activeView = 'guide'; // 'guide', 'planner', 'log', 'reporting'
+        let plannerPlantingDate = null;
+        let plannerPlannedEvents = [];
+        let plannerCompletedEvents = [];
+
+        const plannerFilters = {
+            status: 'all',
+            phases: {
+                sprouting: true,
+                curing: true,
+                slip_rooting: true,
+                slip_planting: true,
+                harvesting: true,
+                storage: true,
+                sales: true,
+            },
+        };
         
         // NEW Data Structure: Log now holds multiple entries per step
         // projectLog = { 
@@ -506,6 +1019,26 @@
             'red': 'border-red-500 bg-red-100',
             'gray': 'border-gray-500 bg-gray-100',
         };
+        const EVENT_CLASS_MAP = {
+            orange: 'event-orange',
+            blue: 'event-blue',
+            green: 'event-green',
+            brown: 'event-brown',
+            gray: 'event-gray',
+            red: 'event-orange',
+        };
+
+        function setActiveTab(viewName) {
+            viewButtonList.forEach((btn) => {
+                btn.classList.remove('is-active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            const activeBtn = viewButtons[viewName];
+            if (activeBtn) {
+                activeBtn.classList.add('is-active');
+                activeBtn.setAttribute('aria-pressed', 'true');
+            }
+        }
 
         // Helper: Format date as YYYYMMDD for Google Calendar
         function formatDateForGoogle(date) {
@@ -513,6 +1046,74 @@
             const m = String(date.getMonth() + 1).padStart(2, '0');
             const d = String(date.getDate()).padStart(2, '0');
             return `${y}${m}${d}`;
+        }
+
+        function formatDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function parseLocalDate(dateStr) {
+            if (!dateStr) return null;
+            const [year, month, day] = dateStr.split('-').map(Number);
+            if (!year || !month || !day) return null;
+            return new Date(year, month - 1, day);
+        }
+
+        function addDays(date, days) {
+            const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            next.setDate(next.getDate() + days);
+            return next;
+        }
+
+        function formatDateForIcs(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}${m}${d}`;
+        }
+
+        function escapeIcsText(value) {
+            return String(value || '')
+                .replace(/\\\\/g, '\\\\\\\\')
+                .replace(/;/g, '\\\\;')
+                .replace(/,/g, '\\\\,')
+                .replace(/\\r?\\n/g, '\\\\n');
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function stripHtmlTags(value) {
+            return String(value ?? '').replace(/<[^>]*>/g, '');
+        }
+
+        function truncateText(value, maxLength) {
+            const text = String(value ?? '');
+            if (text.length <= maxLength) return text;
+            return `${text.slice(0, maxLength - 3).trim()}...`;
+        }
+
+        function mapPhaseToCategory(phase) {
+            const normalized = String(phase || '').toLowerCase();
+            if (normalized.includes('sprouting')) return 'sprouting';
+            if (normalized.includes('rooting')) return 'slip_rooting';
+            if (normalized.includes('curing')) return 'curing';
+            if (normalized.includes('harvest')) return 'harvesting';
+            if (normalized.includes('storage')) return 'storage';
+            if (normalized.includes('sales')) return 'sales';
+            if (normalized.includes('growing')) return 'slip_planting';
+            if (normalized.includes('field prep')) return 'slip_planting';
+            if (normalized.includes('monitoring')) return 'slip_planting';
+            return 'slip_planting';
         }
 
         // Helper: Get Google Calendar URL for a single event
@@ -535,7 +1136,7 @@
 
         // Helper: Get Google Calendar URL for ALL events (iCal/Web Cal)
         function getBulkCalendarUrl(events) {
-            const baseUrl = 'https.calendar.google.com/calendar/render?action=TEMPLATE';
+            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
             let bulkTitle = "Sweet Potato Full Project Plan";
             let bulkDetails = "Your full scheduled plan, calculated based on your Planting Date:\n";
 
@@ -543,7 +1144,7 @@
                 // Ensure eventDate is a date object
                 const readableDate = new Date(event.startDate).toDateString();
 
-                bulkDetails += `\n${index + 1}. ${event.activity}: ${readableDate}. Duration: ${event.durationDays ? event.durationDays + ' days' : '1 day'}.`;
+                bulkDetails += `\n${index + 1}. ${event.title}: ${readableDate}. Duration: ${event.durationDays ? event.durationDays + ' days' : '1 day'}.`;
             });
 
             // For simplicity, we create a single "Project Start" event with all dates in the details
@@ -563,16 +1164,619 @@
             return parseFloat(document.getElementById(id)?.value) || 0;
         };
 
+        function syncCollapsibleHeights(root = document) {
+            root.querySelectorAll('.collapsible-content').forEach((section) => {
+                if (section.classList.contains('is-collapsed')) {
+                    section.style.maxHeight = '0px';
+                } else {
+                    section.style.maxHeight = `${section.scrollHeight}px`;
+                }
+            });
+        }
+
+        function shouldIncludeInPlanner(event) {
+            if (event.durationKey === undefined && event.durationDays === undefined && event.fixedStartDays === undefined) {
+                if (event.id === 'cut_slips') return false;
+                if (!event.logFields || event.logFields.length === 0) return false;
+            }
+            return true;
+        }
+
+        function buildPlannedEvents(dynamicSchedule, plantingDate) {
+            const plannedEvents = [];
+            dynamicSchedule.forEach((event) => {
+                if (!shouldIncludeInPlanner(event)) return;
+                const stepMeta = steps[event.step - 1];
+                const stepId = stepMeta ? stepMeta.id : event.id;
+                const startDate = addDays(plantingDate, event.offsetDays);
+                const duration = event.durationDays > 0 ? event.durationDays : 1;
+                plannedEvents.push({
+                    id: event.id,
+                    stepId,
+                    title: event.activity,
+                    startDate,
+                    durationDays: duration,
+                    icon: event.icon || '',
+                    color: event.color || 'gray',
+                    phase: event.phase,
+                    category: mapPhaseToCategory(event.phase),
+                    details: event.details,
+                    instruction: stepMeta ? stepMeta.description : event.details,
+                    step: event.step,
+                    type: 'planned',
+                });
+            });
+            return plannedEvents;
+        }
+
+        function buildCompletedEvents() {
+            const completedEvents = [];
+            baseSchedule.forEach((scheduleItem) => {
+                const stepMeta = steps[scheduleItem.step - 1];
+                const stepId = stepMeta ? stepMeta.id : scheduleItem.id;
+                const stepLog = projectLog[stepId];
+                if (!stepLog) return;
+
+                if (stepLog.date) {
+                    const completionDate = parseLocalDate(stepLog.date);
+                    if (completionDate) {
+                        completedEvents.push({
+                            id: stepId,
+                            stepId,
+                            title: `${scheduleItem.activity} - Step Complete`,
+                            date: completionDate,
+                            color: scheduleItem.color || 'gray',
+                            category: mapPhaseToCategory(scheduleItem.phase),
+                            type: 'completed',
+                            details: scheduleItem.details,
+                            instruction: stepMeta ? stepMeta.description : scheduleItem.details,
+                        });
+                    }
+                }
+
+                if (!scheduleItem.logFields || scheduleItem.logFields.length === 0) return;
+                const dateFields = scheduleItem.logFields.filter((field) => field.type === 'date');
+                if (dateFields.length === 0) return;
+
+                (stepLog.entries || []).forEach((entry) => {
+                    dateFields.forEach((field) => {
+                        const dateValue = entry[field.label];
+                        const entryDate = parseLocalDate(dateValue);
+                        if (!entryDate) return;
+
+                        completedEvents.push({
+                            id: stepId,
+                            stepId,
+                            title: `${scheduleItem.activity} - ${field.label}`,
+                            date: entryDate,
+                            color: scheduleItem.color || 'gray',
+                            category: mapPhaseToCategory(scheduleItem.phase),
+                            type: 'completed',
+                            details: scheduleItem.details,
+                            instruction: stepMeta ? stepMeta.description : scheduleItem.details,
+                        });
+                    });
+                });
+            });
+            return completedEvents;
+        }
+
+        function filterPlannerEvents(plannedEvents, completedEvents) {
+            const phaseFilter = plannerFilters.phases;
+            const matchesPhase = (event) => phaseFilter[event.category] !== false;
+            let filteredPlanned = plannedEvents.filter(matchesPhase);
+            let filteredCompleted = completedEvents.filter(matchesPhase);
+
+            if (plannerFilters.status === 'planned') {
+                filteredCompleted = [];
+            } else if (plannerFilters.status === 'completed') {
+                filteredPlanned = [];
+            }
+
+            return { planned: filteredPlanned, completed: filteredCompleted };
+        }
+
+        function buildEventsByDay(plannedEvents, completedEvents) {
+            const eventsByDay = new Map();
+            const pushEvent = (event) => {
+                const key = formatDateKey(event.date);
+                if (!eventsByDay.has(key)) {
+                    eventsByDay.set(key, []);
+                }
+                eventsByDay.get(key).push(event);
+            };
+
+            plannedEvents.forEach((event) => {
+                const duration = event.durationDays || 1;
+                for (let dayIndex = 0; dayIndex < duration; dayIndex += 1) {
+                    pushEvent({
+                        ...event,
+                        date: addDays(event.startDate, dayIndex),
+                        dayIndex,
+                        totalDays: duration,
+                    });
+                }
+            });
+
+            completedEvents.forEach((event) => {
+                pushEvent({
+                    ...event,
+                    date: event.date,
+                    totalDays: 1,
+                    dayIndex: 0,
+                });
+            });
+
+            return eventsByDay;
+        }
+
+        function getCalendarRange(plannedEvents, completedEvents, plantingDate) {
+            let minDate = null;
+            let maxDate = null;
+            const considerDate = (date) => {
+                if (!minDate || date < minDate) minDate = date;
+                if (!maxDate || date > maxDate) maxDate = date;
+            };
+
+            plannedEvents.forEach((event) => {
+                considerDate(event.startDate);
+                considerDate(addDays(event.startDate, (event.durationDays || 1) - 1));
+            });
+            completedEvents.forEach((event) => {
+                considerDate(event.date);
+            });
+
+            if (!minDate && plantingDate) {
+                minDate = new Date(plantingDate.getFullYear(), plantingDate.getMonth(), 1);
+                maxDate = addDays(minDate, 30);
+            }
+
+            return { minDate, maxDate };
+        }
+
+        function renderPlannerCalendar(plantingDate, plannedEvents, completedEvents) {
+            if (!plannerCalendar || !plannerCalendarWrap) return;
+            const filteredEvents = filterPlannerEvents(plannedEvents, completedEvents);
+            plannerCalendarWrap.classList.remove('hidden');
+            if (!filteredEvents.planned.length && !filteredEvents.completed.length) {
+                plannerCalendar.innerHTML = '<p class="text-sm text-gray-500 italic">No events match the selected filters.</p>';
+                return;
+            }
+            const eventsByDay = buildEventsByDay(filteredEvents.planned, filteredEvents.completed);
+            const { minDate, maxDate } = getCalendarRange(filteredEvents.planned, filteredEvents.completed, plantingDate);
+            if (!minDate || !maxDate) {
+                plannerCalendar.innerHTML = '';
+                return;
+            }
+
+            const startMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+            const endMonth = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+            const todayKey = formatDateKey(new Date());
+            const plantingKey = plantingDate ? formatDateKey(plantingDate) : null;
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const typeOrder = { completed: 0, planned: 1 };
+
+            let html = '';
+            for (let cursor = new Date(startMonth); cursor <= endMonth; cursor.setMonth(cursor.getMonth() + 1)) {
+                const monthYear = cursor.toLocaleString('default', { month: 'long', year: 'numeric' });
+                const firstDay = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+                const startOffset = firstDay.getDay();
+                const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+
+                let daysHtml = '<div class="calendar-days">';
+                dayNames.forEach((dayName) => {
+                    daysHtml += `<div class="day-name">${dayName}</div>`;
+                });
+                daysHtml += '</div><div class="calendar-days">';
+
+                for (let i = 0; i < startOffset; i += 1) {
+                    daysHtml += '<div class="day-cell is-empty"></div>';
+                }
+
+                for (let day = 1; day <= daysInMonth; day += 1) {
+                    const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+                    const dateKey = formatDateKey(date);
+                    const cellClasses = ['day-cell'];
+                    if (dateKey === todayKey) cellClasses.push('is-today');
+                    if (plantingKey && dateKey === plantingKey) cellClasses.push('is-planting');
+
+                    const events = (eventsByDay.get(dateKey) || []).slice().sort((a, b) => {
+                        return typeOrder[a.type] - typeOrder[b.type] || a.title.localeCompare(b.title);
+                    });
+
+                    const maxEventsToShow = 3;
+                    const visibleEvents = events.slice(0, maxEventsToShow);
+                    const extraCount = events.length - maxEventsToShow;
+                    let eventsHtml = '';
+
+                    visibleEvents.forEach((event) => {
+                        const statusLabel = event.type === 'completed' ? 'Completed' : 'Planned';
+                        const dayLabel = event.type === 'planned' && event.totalDays > 1
+                            ? `${event.title} (${event.dayIndex + 1}/${event.totalDays})`
+                            : event.title;
+                        const fullLabel = `${statusLabel}: ${dayLabel}`;
+                        const instructionText = stripHtmlTags(event.instruction || '');
+                        const detailsText = stripHtmlTags(event.details || '');
+                        const combinedText = `${instructionText}${detailsText ? ` Details: ${detailsText}` : ''}`.trim();
+                        const tooltipText = truncateText(combinedText || 'Click to open instructions', 200);
+                        const tooltipHtml = `
+                            <span class="event-tooltip">
+                                ${escapeHtml(tooltipText)}
+                                <br>
+                                <span class="text-xs opacity-80">Click to open instructions</span>
+                            </span>
+                        `;
+                        const eventClass = EVENT_CLASS_MAP[event.color] || 'event-gray';
+                        eventsHtml += `
+                            <button type="button" class="calendar-event ${event.type} ${eventClass}" data-step="${escapeHtml(event.stepId || '')}" aria-label="${escapeHtml(fullLabel)}">
+                                ${escapeHtml(fullLabel)}
+                                ${tooltipHtml}
+                            </button>
+                        `;
+                    });
+
+                    if (extraCount > 0) {
+                        eventsHtml += `<span class="calendar-more">+${extraCount} more</span>`;
+                    }
+
+                    daysHtml += `
+                        <div class="${cellClasses.join(' ')}">
+                            <span class="day-number">${day}</span>
+                            <div class="event-stack">${eventsHtml}</div>
+                        </div>
+                    `;
+                }
+
+                daysHtml += '</div>';
+                html += `
+                    <div class="calendar-month">
+                        <div class="calendar-month-header">
+                            <h5 class="text-lg font-bold text-gray-700">${monthYear}</h5>
+                        </div>
+                        ${daysHtml}
+                    </div>
+                `;
+            }
+
+            plannerCalendar.innerHTML = html;
+        }
+
+        function buildIcsFile(events) {
+            const nowStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const lines = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Sweet Potato Farm//Planner//EN',
+                'CALSCALE:GREGORIAN',
+            ];
+
+            events.forEach((event) => {
+                const startDate = event.startDate || event.date;
+                const duration = event.durationDays || 1;
+                const endDate = addDays(startDate, duration);
+                const startStr = formatDateForIcs(startDate);
+                const endStr = formatDateForIcs(endDate);
+                const uid = `${startStr}-${event.type}-${event.id || 'log'}-${Math.random().toString(36).slice(2, 9)}@sweetpotato`;
+                const summaryPrefix = event.type === 'completed' ? 'Completed' : 'Planned';
+                const summary = `${summaryPrefix}: ${event.title}`;
+                const details = event.details ? `${event.details}` : '';
+
+                lines.push(
+                    'BEGIN:VEVENT',
+                    `UID:${escapeIcsText(uid)}`,
+                    `DTSTAMP:${nowStamp}`,
+                    `SUMMARY:${escapeIcsText(summary)}`,
+                    `DESCRIPTION:${escapeIcsText(details)}`,
+                    `DTSTART;VALUE=DATE:${startStr}`,
+                    `DTEND;VALUE=DATE:${endStr}`,
+                    'END:VEVENT'
+                );
+            });
+
+            lines.push('END:VCALENDAR');
+            return lines.join('\r\n');
+        }
+
+        function downloadCalendarIcs(events) {
+            if (!events.length) return;
+            const sortedEvents = events.slice().sort((a, b) => {
+                const aDate = a.startDate || a.date;
+                const bDate = b.startDate || b.date;
+                return aDate - bDate;
+            });
+            const icsContent = buildIcsFile(sortedEvents);
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'sweet_potato_planner.ics';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function refreshPlannerCalendar() {
+            if (!plannerPlantingDate) return;
+            plannerCompletedEvents = buildCompletedEvents();
+            renderPlannerCalendar(plannerPlantingDate, plannerPlannedEvents, plannerCompletedEvents);
+        }
+
+        function renderCalendarLinks(events) {
+            if (!calendarLinksOutput) return;
+            if (!events.length) {
+                calendarLinksOutput.classList.add('hidden');
+                calendarLinksOutput.innerHTML = '';
+                return;
+            }
+
+            let html = '<p class="text-sm text-gray-600 font-medium">Pop-ups blocked? Use these links:</p>';
+            events.forEach((event) => {
+                const url = getGoogleCalendarUrl(event.startDate, event.title, event.details, event.durationDays, event.step);
+                const label = `${event.title} (${event.startDate.toDateString()})`;
+                html += `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+            });
+            calendarLinksOutput.innerHTML = html;
+            calendarLinksOutput.classList.remove('hidden');
+        }
+
+        function openGoogleCalendarEvents(events) {
+            if (!events.length) return;
+            const sortedEvents = events.slice().sort((a, b) => a.startDate - b.startDate);
+            renderCalendarLinks(sortedEvents);
+            sortedEvents.forEach((event, index) => {
+                const url = getGoogleCalendarUrl(event.startDate, event.title, event.details, event.durationDays, event.step);
+                setTimeout(() => {
+                    const newWindow = window.open(url, '_blank', 'noopener');
+                    if (newWindow) {
+                        newWindow.opener = null;
+                    }
+                }, index * 200);
+            });
+        }
+
+        function openPrintableCalendar() {
+            if (!plannerCalendar || !plannerCalendar.innerHTML) return;
+            const printWindow = window.open('', '_blank', 'noopener');
+            if (!printWindow) return;
+
+            const heading = plannerPlantingDate
+                ? `Sweet Potato Calendar (Planting: ${plannerPlantingDate.toDateString()})`
+                : 'Sweet Potato Calendar';
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${heading}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 24px; color: #1f2933; }
+                        h1 { font-size: 20px; margin-bottom: 12px; }
+                        .calendar-grid { display: grid; gap: 16px; }
+                        .calendar-month { border: 1px solid #cbd2d9; border-radius: 10px; padding: 12px; }
+                        .calendar-month-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+                        .calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+                        .day-name { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; color: #616e7c; font-weight: 700; }
+                        .day-cell { min-height: 72px; border: 1px solid #e4e7eb; border-radius: 8px; padding: 4px; font-size: 10px; }
+                        .day-cell.is-empty { border-color: transparent; }
+                        .day-number { font-weight: 700; display: block; margin-bottom: 4px; }
+                        .calendar-event { display: block; margin-bottom: 4px; font-size: 10px; padding: 2px 4px; border-radius: 999px; border: 1px solid #d9b79f; background: transparent; appearance: none; text-align: left; cursor: default; }
+                        .event-tooltip { display: none; }
+                        .calendar-more { font-size: 9px; color: #7b8794; }
+                        .event-orange { background: #fde8d8; border-color: #d45b2b; }
+                        .event-blue { background: #e2effb; border-color: #2a6fb0; }
+                        .event-green { background: #e7f4ea; border-color: #3f7c4b; }
+                        .event-brown { background: #f1e3d7; border-color: #7a4c2b; }
+                        .event-gray { background: #f3efe8; border-color: #9c8f7b; }
+                        @media print {
+                            body { margin: 10mm; }
+                            .calendar-month { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>${heading}</h1>
+                    ${plannerCalendar.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+        }
+
+        function setupPlannerFilters() {
+            if (!plannerFiltersContainer) return;
+            plannerFiltersContainer.addEventListener('change', (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLInputElement)) return;
+                if (target.name === 'status-filter') {
+                    plannerFilters.status = target.value;
+                } else if (target.type === 'checkbox') {
+                    plannerFilters.phases[target.value] = target.checked;
+                }
+                if (!plannerPlantingDate) return;
+                renderPlannerCalendar(plannerPlantingDate, plannerPlannedEvents, plannerCompletedEvents);
+            });
+        }
+
+        function setupPlannerInteractions() {
+            if (!plannerCalendar) return;
+            plannerCalendar.addEventListener('click', (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) return;
+                const eventButton = target.closest('.calendar-event');
+                if (!eventButton) return;
+                const stepId = eventButton.getAttribute('data-step');
+                if (!stepId) return;
+                const stepIndex = steps.findIndex((step) => step.id === stepId);
+                if (stepIndex === -1) return;
+                currentStep = stepIndex;
+                setView('guide');
+            });
+        }
+
+        function isTestMode() {
+            return new URLSearchParams(window.location.search).has('test');
+        }
+
+        function renderTestResults(results) {
+            const panel = document.createElement('div');
+            panel.setAttribute('id', 'test-results');
+            panel.style.cssText = [
+                'position:fixed',
+                'bottom:16px',
+                'right:16px',
+                'max-width:360px',
+                'max-height:60vh',
+                'overflow:auto',
+                'background:#fff',
+                'border:2px solid #1f2933',
+                'border-radius:12px',
+                'padding:12px',
+                'font-family:Arial, sans-serif',
+                'font-size:12px',
+                'box-shadow:0 10px 24px rgba(0,0,0,0.15)',
+                'z-index:9999'
+            ].join(';');
+            const passCount = results.filter(result => result.pass).length;
+            const heading = document.createElement('div');
+            heading.textContent = `Test Results: ${passCount}/${results.length} passing`;
+            heading.style.fontWeight = '700';
+            heading.style.marginBottom = '8px';
+            panel.appendChild(heading);
+
+            results.forEach((result) => {
+                const row = document.createElement('div');
+                row.textContent = `${result.pass ? '[PASS]' : '[FAIL]'} ${result.name}${result.details ? ` - ${result.details}` : ''}`;
+                row.style.color = result.pass ? '#1a7f37' : '#b42318';
+                row.style.marginBottom = '4px';
+                panel.appendChild(row);
+            });
+
+            document.body.appendChild(panel);
+        }
+
+        async function runTests() {
+            const results = [];
+            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            const assert = (name, condition, details = '') => {
+                results.push({ name, pass: Boolean(condition), details });
+            };
+
+            const projectLogSnapshot = JSON.parse(JSON.stringify(projectLog));
+            const currentStepSnapshot = currentStep;
+            const activeViewSnapshot = activeView;
+            const plantingSnapshot = plantingDateInput.value;
+
+            setView('planner');
+            plantingDateInput.value = '2025-05-15';
+            calculateAndRenderSchedule();
+            await wait(50);
+
+            assert('steps length is 11', steps.length === 11, `found ${steps.length}`);
+            assert('baseSchedule length is 11', baseSchedule.length === 11, `found ${baseSchedule.length}`);
+            assert('planner actions visible', !plannerActions.classList.contains('hidden'));
+            assert('calendar months render', plannerCalendar.querySelectorAll('.calendar-month').length > 0);
+            assert('calendar events render', plannerCalendar.querySelectorAll('.calendar-event').length > 0);
+
+            projectLog = {
+                harvest: {
+                    done: true,
+                    date: '2025-09-20',
+                    entries: [
+                        { 'Harvest Date': '2025-09-20', 'Field/Bed ID': 'Bed A', 'Total Harvest (Kg)': '10' }
+                    ],
+                },
+            };
+            refreshPlannerCalendar();
+            await wait(50);
+
+            const calendarText = plannerCalendar.textContent || '';
+            assert('completed events render', calendarText.includes('Completed:'));
+
+            const plannedFilter = plannerFiltersContainer.querySelector('input[name="status-filter"][value="planned"]');
+            if (plannedFilter) {
+                plannedFilter.checked = true;
+                plannedFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                await wait(50);
+                assert('planned filter hides completed', !(plannerCalendar.textContent || '').includes('Completed:'));
+            } else {
+                assert('planned filter present', false, 'status filter not found');
+            }
+
+            const completedFilter = plannerFiltersContainer.querySelector('input[name="status-filter"][value="completed"]');
+            if (completedFilter) {
+                completedFilter.checked = true;
+                completedFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                await wait(50);
+                assert('completed filter hides planned', !(plannerCalendar.textContent || '').includes('Planned:'));
+            } else {
+                assert('completed filter present', false, 'status filter not found');
+            }
+
+            const allFilter = plannerFiltersContainer.querySelector('input[name="status-filter"][value="all"]');
+            if (allFilter) {
+                allFilter.checked = true;
+                allFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                await wait(50);
+            }
+
+            const harvestingFilter = plannerFiltersContainer.querySelector('input[value="harvesting"]');
+            if (harvestingFilter) {
+                harvestingFilter.checked = false;
+                harvestingFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                await wait(50);
+                assert('harvest filter hides harvest events', !(plannerCalendar.textContent || '').includes('Harvest Tubers'));
+                harvestingFilter.checked = true;
+                harvestingFilter.dispatchEvent(new Event('change', { bubbles: true }));
+                await wait(50);
+            } else {
+                assert('harvesting filter present', false, 'harvesting filter not found');
+            }
+
+            const tooltipExists = plannerCalendar.querySelector('.calendar-event .event-tooltip');
+            assert('event tooltips render', Boolean(tooltipExists));
+
+            const firstEvent = plannerCalendar.querySelector('.calendar-event[data-step]');
+            if (firstEvent) {
+                firstEvent.click();
+                await wait(350);
+                assert('click opens guide view', activeView === 'guide');
+                assert('current step updated', currentStep >= 0);
+            } else {
+                assert('calendar event is clickable', false, 'no event found to click');
+            }
+
+            projectLog = projectLogSnapshot;
+            plantingDateInput.value = plantingSnapshot;
+            setView(activeViewSnapshot);
+            currentStep = currentStepSnapshot;
+            if (activeViewSnapshot === 'planner') {
+                calculateAndRenderSchedule();
+            }
+
+            renderTestResults(results);
+        }
+
         // --- NEW: Collapsible Section Toggle ---
         function toggleSection(sectionId) {
             const content = document.getElementById(sectionId);
-            const icon = document.querySelector(`[data-controls="${sectionId}"] .chevron-icon`);
-            
-            if (content) {
-                content.classList.toggle('hidden');
+            const toggleBtn = document.querySelector(`[data-controls="${sectionId}"]`);
+            if (!content) return;
+
+            const isCollapsed = content.classList.toggle('is-collapsed');
+            content.style.maxHeight = isCollapsed ? '0px' : `${content.scrollHeight}px`;
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', String(!isCollapsed));
             }
+            const icon = toggleBtn ? toggleBtn.querySelector('.chevron-icon') : null;
             if (icon) {
-                icon.classList.toggle('rotate-180');
+                icon.classList.toggle('rotate-180', isCollapsed);
             }
         }
 
@@ -633,30 +1837,34 @@
                 calendarOutput.innerHTML = `<p class="text-gray-500 italic" id="planner-placeholder">
                     Enter a planting date above to see your full schedule.
                 </p>`;
-                addAllBtn.classList.add('hidden');
+                plannerActions.classList.add('hidden');
+                plannerCalendarWrap.classList.add('hidden');
+                plannerCalendar.innerHTML = '';
+                renderCalendarLinks([]);
                 return;
             }
 
-            const plantingDate = new Date(plantingDateStr);
-            // Ensure plantingDate is treated as the start of Day 0 in a fixed time context
-            plantingDate.setUTCHours(0, 0, 0, 0); 
+            const plantingDate = parseLocalDate(plantingDateStr);
+            if (!plantingDate) {
+                plannerActions.classList.add('hidden');
+                plannerCalendarWrap.classList.add('hidden');
+                plannerCalendar.innerHTML = '';
+                renderCalendarLinks([]);
+                return;
+            }
             
             const dynamicSchedule = getDynamicSchedule();
+            const plannedEvents = buildPlannedEvents(dynamicSchedule, plantingDate);
+            const completedEvents = buildCompletedEvents();
+            plannerPlantingDate = plantingDate;
+            plannerPlannedEvents = plannedEvents;
+            plannerCompletedEvents = completedEvents;
+            renderCalendarLinks([]);
             let html = '<ul class="space-y-4">';
             let prevDate = null;
-            let eventsWithDates = [];
 
-            dynamicSchedule.forEach((event, index) => {
-                // Skip events with no duration (like 'cut_slips' which is just for logging)
-                if (event.durationKey === undefined && event.durationDays === undefined && event.fixedStartDays === undefined) {
-                    // UPDATED: Check if logFields exist. If they do, but it's not a "duration" event (like sales), we should still show it.
-                    // But we will still skip cut_slips as it's an intermittent logging activity.
-                    if (event.id === 'cut_slips') return; 
-                    if ((!event.logFields || event.logFields.length === 0)) return;
-                }
-
-                const eventDate = new Date(plantingDate);
-                eventDate.setDate(plantingDate.getDate() + event.offsetDays);
+            plannedEvents.forEach((event) => {
+                const eventDate = event.startDate;
                 const readableDate = eventDate.toDateString();
                 
                 // Calculate days from previous event (only used for display, not logic)
@@ -671,31 +1879,28 @@
                 prevDate = eventDate;
 
                 // Duration for Calendar is at least 1 day
-                const duration = event.durationDays > 0 ? event.durationDays : 1; 
+                const duration = event.durationDays || 1; 
 
-                const calendarUrl = getGoogleCalendarUrl(eventDate, event.activity, event.details, duration, event.step);
+                const calendarUrl = getGoogleCalendarUrl(eventDate, event.title, event.details, duration, event.step);
                 const colorClass = COLORS[event.color] || 'border-gray-500 bg-gray-100';
-
-                // Store event with calculated date for the bulk calendar link
-                eventsWithDates.push({ ...event, startDate: eventDate, durationDays: duration });
 
                 html += `
                     <li class="p-3 border-l-4 ${colorClass} rounded-md">
                         <div class="flex items-center justify-between">
                             <p class="font-bold text-lg text-gray-800 flex items-center">
-                                ${event.icon} ${event.activity}
+                                ${event.icon} ${event.title}
                             </p>
                             ${daysDifference}
                         </div>
                         <p class="text-sm text-gray-700 mt-1">
                             Date: <span class="font-semibold">${readableDate}</span>
                             <span class="ml-4 text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">Phase: ${event.phase}</span>
-                            <span class="ml-2 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full">${event.durationDays > 0 ? event.durationDays + ' Day Duration' : 'Single Day Event'}</span>
+                            <span class="ml-2 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full">${event.durationDays > 1 ? event.durationDays + ' Day Duration' : 'Single Day Event'}</span>
                         </p>
                         <p class="text-sm text-gray-600 mt-1">
                             <span class="font-medium">Details:</span> ${event.details}
                         </p>
-                        <a href="${calendarUrl}" target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:text-blue-800 transition duration-150">
+                        <a href="${calendarUrl}" target="_blank" rel="noopener noreferrer" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:text-blue-800 transition duration-150">
                             + Add Single Event to Calendar
                         </a>
                     </li>
@@ -704,12 +1909,23 @@
 
             html += '</ul>';
             calendarOutput.innerHTML = html;
+            renderPlannerCalendar(plantingDate, plannedEvents, completedEvents);
             
             // Update the Add All button event handler with the calculated dates
             addAllBtn.onclick = () => {
-                window.open(getBulkCalendarUrl(eventsWithDates), '_blank');
+                openGoogleCalendarEvents(plannedEvents);
             };
-            addAllBtn.classList.remove('hidden');
+            if (downloadIcsBtn) {
+                downloadIcsBtn.onclick = () => {
+                    downloadCalendarIcs([...plannedEvents, ...completedEvents]);
+                };
+            }
+            if (printCalendarBtn) {
+                printCalendarBtn.onclick = () => {
+                    openPrintableCalendar();
+                };
+            }
+            plannerActions.classList.remove('hidden');
         }
 
         // --- ACTIVITY LOG LOGIC (REFACTORED) ---
@@ -737,7 +1953,7 @@
 
                 html += `
                     <div class="p-4 activity-log-card bg-white rounded-lg border-l-4 ${stepLog.done ? 'border-green-600' : 'border-gray-300'}">
-                        <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('${contentId}')" data-controls="${contentId}">
+                        <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('${contentId}')" data-controls="${contentId}" aria-controls="${contentId}" aria-expanded="true">
                             <p class="font-bold text-gray-700">${step.visual.replace(/→/g, '→')} Step ${index + 1}: ${step.title}</p>
                             <div class="flex items-center">
                                 <label class="flex items-center space-x-2 mr-4" onclick="event.stopPropagation();">
@@ -776,12 +1992,13 @@
                     statusElement.textContent = `Step marked complete on: ${dateText}.`;
                 }
             }
+            syncCollapsibleHeights(logEntriesContainer);
         }
 
         function renderLogEntry(stepId, entryIndex, logFields, entryData) {
             let fieldsHtml = '';
             logFields.forEach(field => {
-                const value = entryData[field.label] || '';
+                const value = entryData[field.label] ?? '';
                 const placeholder = field.placeholder || `Enter ${field.label}`;
                 if (field.type === 'textarea') {
                     fieldsHtml += `
@@ -828,6 +2045,7 @@
 
             projectLog[stepId].entries.push(newEntry);
             renderLog(); // Re-render the log to show the new entry form
+            refreshPlannerCalendar();
         }
 
         function removeLogEntry(stepId, entryIndex) {
@@ -835,6 +2053,7 @@
             if (stepLog && stepLog.entries[entryIndex]) {
                 stepLog.entries.splice(entryIndex, 1);
                 renderLog(); // Re-render
+                refreshPlannerCalendar();
             }
         }
 
@@ -843,6 +2062,7 @@
             if (entry) {
                 entry[label] = value;
                 // Data is saved in the projectLog object, no need to re-render just for a value change
+                refreshPlannerCalendar();
             }
         }
 
@@ -854,6 +2074,7 @@
                 projectLog[id].date = new Date().toISOString().substring(0, 10);
             } 
             renderLog();
+            refreshPlannerCalendar();
         }
 
         function updateDate(id, dateValue) {
@@ -864,6 +2085,7 @@
                 projectLog[id].done = true;
             } 
             renderLog();
+            refreshPlannerCalendar();
         }
 
 
@@ -881,7 +2103,7 @@
             const slipsRooted = projectLog['root_slips']?.entries || [];
             const slipsPlanted = projectLog['plant_field']?.entries || [];
             const soilTests = projectLog['soil_prep']?.entries || [];
-            const pestSightings = projectLog['scouting_start']?.entries || []; // Corrected ID
+            const pestSightings = projectLog['scouting']?.entries || [];
             const harvests = projectLog['harvest']?.entries || [];
             const sales = projectLog['sale']?.entries || []; // NEW: Get sales data
 
@@ -917,7 +2139,7 @@
                 
                 <!-- Summary Metrics -->
                 <div class="report-section bg-gray-50 p-4 rounded-lg mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-totals')" data-controls="report-totals">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-totals')" data-controls="report-totals" aria-controls="report-totals" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Key Totals</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -947,7 +2169,7 @@
 
                 <!-- NEW: Financial Metrics -->
                 <div class="report-section bg-gray-50 p-4 rounded-lg mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-financials')" data-controls="report-financials">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-financials')" data-controls="report-financials" aria-controls="report-financials" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Financial Summary</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -973,7 +2195,7 @@
 
                 <!-- Propagation Funnel -->
                 <div class="report-section mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-funnel')" data-controls="report-funnel">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-funnel')" data-controls="report-funnel" aria-controls="report-funnel" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Propagation Funnel</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -1001,7 +2223,7 @@
 
                 <!-- Harvest Details -->
                 <div class="report-section mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-harvest')" data-controls="report-harvest">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-harvest')" data-controls="report-harvest" aria-controls="report-harvest" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Harvest Log (Total: ${totalHarvestKg.toFixed(1)} Kg, Avg: ${avgHarvestPerPlanting} Kg/Entry)</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -1014,7 +2236,7 @@
 
                 <!-- Pest Log -->
                 <div class="report-section mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-pest')" data-controls="report-pest">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-pest')" data-controls="report-pest" aria-controls="report-pest" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Pest & Disease Log (${pestSightings.length} sightings)</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -1027,7 +2249,7 @@
 
                 <!-- Soil Tests -->
                 <div class="report-section mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-soil')" data-controls="report-soil">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-soil')" data-controls="report-soil" aria-controls="report-soil" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Soil Test Log (Avg. pH: ${avgPH})</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -1040,7 +2262,7 @@
 
                 <!-- NEW: Sales Log -->
                 <div class="report-section mb-6">
-                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-sales')" data-controls="report-sales">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-sales')" data-controls="report-sales" aria-controls="report-sales" aria-expanded="true">
                         <h5 class="text-xl font-semibold text-gray-700">Sales Log (Total: $${totalRevenue.toFixed(2)})</h5>
                         <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -1053,6 +2275,19 @@
             `;
 
             reportOutput.innerHTML = html;
+            syncCollapsibleHeights(reportOutput);
+        }
+
+        function printReport() {
+            setView('reporting');
+            renderReport(true);
+            requestAnimationFrame(() => {
+                reportOutput.querySelectorAll('.collapsible-content').forEach((section) => {
+                    section.classList.remove('is-collapsed');
+                });
+                syncCollapsibleHeights(reportOutput);
+                window.print();
+            });
         }
 
         function createTableHtml(data, headers) {
@@ -1073,7 +2308,7 @@
             data.forEach(entry => {
                 table += '<tr>';
                 headers.forEach(header => {
-                    table += `<td class="px-4 py-3 whitespace-nowLrap text-sm text-gray-700">${entry[header] || ''}</td>`;
+                    table += `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${entry[header] ?? ''}</td>`;
                 });
                 table += '</tr>';
             });
@@ -1110,13 +2345,7 @@
             reportingTool.classList.add('hidden');
             progressContainer.classList.add('hidden');
             guideFooter.classList.add('hidden');
-
-            // Reset button styles
-            toggleGuideBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
-            togglePlannerBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
-            toggleLogBtn.className = 'flex-1 btn-secondary px-4 py-2 rounded-lg font-bold text-sm';
-            toggleReportingBtn.className = 'col-span-3 mt-2 flex-1 btn-tertiary px-4 py-2 rounded-lg font-bold text-sm';
-
+            setActiveTab(viewName);
 
             // Show active content area and set button style
             if (viewName === 'guide') {
@@ -1124,19 +2353,15 @@
                 progressContainer.classList.remove('hidden');
                 guideFooter.classList.remove('hidden');
                 stepActions.classList.remove('hidden');
-                toggleGuideBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
                 renderStep();
             } else if (viewName === 'planner') {
                 plannerTool.classList.remove('hidden');
-                togglePlannerBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
                 calculateAndRenderSchedule();
             } else if (viewName === 'log') {
                 projectLogTool.classList.remove('hidden');
-                toggleLogBtn.className = 'flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
                 renderLog();
             } else if (viewName === 'reporting') {
                 reportingTool.classList.remove('hidden');
-                toggleReportingBtn.className = 'col-span-3 mt-2 flex-1 btn-primary px-4 py-2 rounded-lg font-bold text-sm';
                 renderReport(true); // Render report immediately
             }
         }
@@ -1210,10 +2435,9 @@
         nextBtn.addEventListener('click', nextStep);
         
         // View Toggles
-        toggleGuideBtn.addEventListener('click', () => setView('guide'));
-        togglePlannerBtn.addEventListener('click', () => setView('planner'));
-        toggleLogBtn.addEventListener('click', () => setView('log'));
-        toggleReportingBtn.addEventListener('click', () => setView('reporting'));
+        Object.entries(viewButtons).forEach(([view, button]) => {
+            button.addEventListener('click', () => setView(view));
+        });
 
         // --- INITIALIZATION ---
         window.onload = () => {
@@ -1223,6 +2447,13 @@
             const downloadBtn = document.getElementById('download-json-btn');
             if(downloadBtn) {
                 downloadBtn.addEventListener('click', downloadReport);
+            }
+            setupPlannerFilters();
+            setupPlannerInteractions();
+            if (isTestMode()) {
+                runTests().catch((error) => {
+                    console.error('Test harness failed:', error);
+                });
             }
         };
         

@@ -43,3 +43,7 @@ HTML5
 Tailwind CSS (via CDN)
 
 Vanilla JavaScript (ES6+)
+
+Automated Tests
+
+Open `index.html?test=1` in a modern browser to run the built-in test harness. A results panel appears in the bottom-right corner.

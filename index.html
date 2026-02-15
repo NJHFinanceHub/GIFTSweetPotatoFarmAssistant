@@ -477,6 +477,21 @@
             font-weight: 600;
             margin-top: 0.35rem;
         }
+        .advice-card {
+            border: 1px solid rgba(42, 36, 28, 0.15);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.85rem;
+        }
+        .advice-card h5 {
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+        }
+        .advice-card p,
+        .advice-card li {
+            font-size: 0.82rem;
+            color: #3f3a32;
+        }
         @media (max-width: 640px) {
             .day-cell {
                 min-height: 80px;
@@ -649,6 +664,47 @@
                     </label>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                    <div class="advice-card">
+                        <h5 class="font-bold text-gray-700">This Week: What should I do?</h5>
+                        <p id="weekly-focus" class="text-gray-700">Set your planting date to see weekly priorities.</p>
+                    </div>
+                    <div class="advice-card">
+                        <h5 class="font-bold text-gray-700">Rain + Irrigation Prompt</h5>
+                        <label for="rainfall-last7" class="text-xs font-semibold text-gray-600">Rainfall in last 7 days (mm)</label>
+                        <input type="number" id="rainfall-last7" min="0" step="1" value="0" class="mt-1 mb-2 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm" placeholder="e.g., 12">
+                        <p id="irrigation-advice" class="text-gray-700">Log rainfall to get a simple watering prompt.</p>
+                    </div>
+                </div>
+
+                <div class="advice-card mb-4">
+                    <h5 class="font-bold text-gray-700">Field Layout & Slip Calculator</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <label class="block text-xs font-semibold text-gray-600">Field Area
+                            <input type="number" id="field-area" min="0" step="0.01" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm">
+                        </label>
+                        <label class="block text-xs font-semibold text-gray-600">Unit
+                            <select id="field-unit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm">
+                                <option value="hectare">Hectare</option>
+                                <option value="acre">Acre</option>
+                            </select>
+                        </label>
+                        <label class="block text-xs font-semibold text-gray-600">Spacing Between Plants (cm)
+                            <input type="number" id="plant-spacing-cm" min="15" step="1" value="30" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm">
+                        </label>
+                        <label class="block text-xs font-semibold text-gray-600">Spacing Between Rows (cm)
+                            <input type="number" id="row-spacing-cm" min="40" step="1" value="90" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm">
+                        </label>
+                        <label class="block text-xs font-semibold text-gray-600">Buffer for Failed Slips (%)
+                            <input type="number" id="slip-buffer" min="0" max="50" step="1" value="15" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-sm">
+                        </label>
+                        <div class="flex items-end">
+                            <button id="calc-layout-btn" class="btn-secondary w-full py-2 rounded-lg text-sm font-bold">Calculate</button>
+                        </div>
+                    </div>
+                    <p id="layout-results" class="mt-2 text-gray-700">Enter field values and tap Calculate.</p>
+                </div>
+
                 <div id="calendar-output" class="mt-4 space-y-3 p-3 bg-white rounded-lg border">
                     <p class="text-gray-500 italic" id="planner-placeholder">
                         Enter a planting date above to see your full schedule.
@@ -739,6 +795,14 @@
                 <h3 class="text-xl font-bold mb-4 text-gray-700">My Project Activity Log <button onclick="setView('guide')" class="link-btn ml-3">Go to Guide</button></h3>
                 
                 <p class="text-sm text-gray-600 mb-4">Use this log to mark steps complete, record the date you did them, and add multiple data entries for key metrics. Click a step title to expand or collapse it.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4 no-print">
+                    <button id="save-data-btn" class="btn-primary px-4 py-2 rounded-lg font-bold text-sm">Save Offline Now</button>
+                    <button id="import-json-btn" class="btn-secondary px-4 py-2 rounded-lg font-bold text-sm">Import Data (JSON)</button>
+                    <button id="clear-data-btn" class="btn-tertiary px-4 py-2 rounded-lg font-bold text-sm">Clear Saved Data</button>
+                </div>
+                <input type="file" id="import-json-file" accept="application/json" class="hidden">
+                <p id="storage-status" class="text-xs text-gray-600 mb-4">Data is kept in this device browser (offline-first).</p>
 
                 <div id="log-entries" class="space-y-4">
                     <!-- Log fields for each step will be inserted here -->
@@ -981,8 +1045,23 @@
         const printCalendarBtn = document.getElementById('print-calendar-btn');
         const plannerFiltersContainer = document.getElementById('planner-filters');
         const calendarLinksOutput = document.getElementById('calendar-links-output');
-        
+        const weeklyFocus = document.getElementById('weekly-focus');
+        const rainfallLast7Input = document.getElementById('rainfall-last7');
+        const irrigationAdvice = document.getElementById('irrigation-advice');
+        const fieldAreaInput = document.getElementById('field-area');
+        const fieldUnitInput = document.getElementById('field-unit');
+        const plantSpacingInput = document.getElementById('plant-spacing-cm');
+        const rowSpacingInput = document.getElementById('row-spacing-cm');
+        const slipBufferInput = document.getElementById('slip-buffer');
+        const calcLayoutBtn = document.getElementById('calc-layout-btn');
+        const layoutResults = document.getElementById('layout-results');
+
         const logEntriesContainer = document.getElementById('log-entries');
+        const storageStatus = document.getElementById('storage-status');
+        const saveDataBtn = document.getElementById('save-data-btn');
+        const importJsonBtn = document.getElementById('import-json-btn');
+        const clearDataBtn = document.getElementById('clear-data-btn');
+        const importJsonFile = document.getElementById('import-json-file');
 
 
         // --- STATE & UTILITIES ---
@@ -1010,6 +1089,7 @@
         //   'step_id': { done: false, date: '', entries: [ { 'Field Label': 'value', ... }, ... ] } 
         // }
         let projectLog = {}; 
+        const OFFLINE_STORAGE_KEY = 'sweet-potato-assistant-v1';
         
         const COLORS = {
             'orange': 'border-orange-500 bg-orange-100',
@@ -1027,6 +1107,129 @@
             gray: 'event-gray',
             red: 'event-orange',
         };
+
+        function setStatusMessage(message, isError = false) {
+            if (!storageStatus) return;
+            storageStatus.textContent = message;
+            storageStatus.classList.toggle('text-red-700', isError);
+            storageStatus.classList.toggle('text-gray-600', !isError);
+        }
+
+        function saveOfflineData() {
+            try {
+                localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify({ projectLog }));
+                setStatusMessage(`Saved offline at ${new Date().toLocaleString()}.`);
+            } catch (error) {
+                console.error('Failed to save offline data:', error);
+                setStatusMessage('Could not save data on this device.', true);
+            }
+        }
+
+        function loadOfflineData() {
+            try {
+                const raw = localStorage.getItem(OFFLINE_STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object' && parsed.projectLog && typeof parsed.projectLog === 'object') {
+                    projectLog = parsed.projectLog;
+                    setStatusMessage('Loaded saved offline data.');
+                }
+            } catch (error) {
+                console.error('Failed to load offline data:', error);
+                setStatusMessage('Saved data is unreadable. You can import a backup JSON.', true);
+            }
+        }
+
+        function clearOfflineData() {
+            try {
+                localStorage.removeItem(OFFLINE_STORAGE_KEY);
+                projectLog = {};
+                renderLog();
+                refreshPlannerCalendar();
+                renderReport(true);
+                setStatusMessage('Saved data cleared from this device.');
+            } catch (error) {
+                console.error('Failed to clear offline data:', error);
+                setStatusMessage('Could not clear saved data.', true);
+            }
+        }
+
+        function importProjectLogFromFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const parsed = JSON.parse(String(reader.result || '{}'));
+                    if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON');
+                    projectLog = parsed.projectLog && typeof parsed.projectLog === 'object' ? parsed.projectLog : parsed;
+                    saveOfflineData();
+                    renderLog();
+                    refreshPlannerCalendar();
+                    renderReport(true);
+                    setStatusMessage('Imported data successfully.');
+                } catch (error) {
+                    console.error('Import failed:', error);
+                    setStatusMessage('Import failed: please choose a valid JSON export file.', true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function getCurrentWeekAdvice(today, plantingDate, events) {
+            if (!plantingDate || !events.length) {
+                return 'Set your planting date, then check this panel every week.';
+            }
+            const weekEnd = addDays(today, 7);
+            const upcoming = events
+                .filter((event) => event.startDate >= today && event.startDate <= weekEnd)
+                .sort((a, b) => a.startDate - b.startDate);
+
+            if (!upcoming.length) {
+                const nextEvent = events
+                    .filter((event) => event.startDate > today)
+                    .sort((a, b) => a.startDate - b.startDate)[0];
+                if (!nextEvent) {
+                    return 'Main cycle is complete. Focus on storage checks, sales, and planning the next planting.';
+                }
+                return `No urgent activity this week. Next key task: ${nextEvent.title} on ${nextEvent.startDate.toDateString()}.`;
+            }
+
+            const firstThree = upcoming.slice(0, 3).map((event) => `${event.title} (${event.startDate.toDateString()})`);
+            return `Priorities this week: ${firstThree.join(' • ')}.`;
+        }
+
+        function updateIrrigationAdvice() {
+            if (!irrigationAdvice || !rainfallLast7Input) return;
+            const rainfall = parseFloat(rainfallLast7Input.value) || 0;
+            if (rainfall < 15) {
+                irrigationAdvice.textContent = 'Low rain week: target 2-3 light irrigations to keep soil moist (not waterlogged).';
+            } else if (rainfall <= 35) {
+                irrigationAdvice.textContent = 'Moderate rain week: check topsoil moisture before watering. One supplemental irrigation may be enough.';
+            } else {
+                irrigationAdvice.textContent = 'High rain week: skip irrigation for now and scout for rot, runoff, and erosion.';
+            }
+        }
+
+        function calculateFieldLayout() {
+            if (!layoutResults) return;
+            const areaValue = parseFloat(fieldAreaInput?.value || '0');
+            const unit = fieldUnitInput?.value || 'hectare';
+            const plantSpacingCm = parseFloat(plantSpacingInput?.value || '0');
+            const rowSpacingCm = parseFloat(rowSpacingInput?.value || '0');
+            const bufferPct = parseFloat(slipBufferInput?.value || '0');
+
+            if (!areaValue || !plantSpacingCm || !rowSpacingCm) {
+                layoutResults.textContent = 'Please enter area and spacing values greater than zero.';
+                return;
+            }
+
+            const areaM2 = unit === 'acre' ? areaValue * 4046.86 : areaValue * 10000;
+            const plantsPerM2 = 10000 / (plantSpacingCm * rowSpacingCm);
+            const baseSlips = Math.round(areaM2 * plantsPerM2);
+            const slipsWithBuffer = Math.round(baseSlips * (1 + Math.max(0, bufferPct) / 100));
+
+            layoutResults.textContent = `Estimated planting spots: ${baseSlips.toLocaleString()} slips. With ${bufferPct}% buffer: ${slipsWithBuffer.toLocaleString()} slips to prepare.`;
+        }
 
         function setActiveTab(viewName) {
             viewButtonList.forEach((btn) => {
@@ -1859,6 +2062,9 @@
             plannerPlantingDate = plantingDate;
             plannerPlannedEvents = plannedEvents;
             plannerCompletedEvents = completedEvents;
+            if (weeklyFocus) {
+                weeklyFocus.textContent = getCurrentWeekAdvice(new Date(), plantingDate, plannedEvents);
+            }
             renderCalendarLinks([]);
             let html = '<ul class="space-y-4">';
             let prevDate = null;
@@ -2046,6 +2252,7 @@
             projectLog[stepId].entries.push(newEntry);
             renderLog(); // Re-render the log to show the new entry form
             refreshPlannerCalendar();
+            saveOfflineData();
         }
 
         function removeLogEntry(stepId, entryIndex) {
@@ -2054,6 +2261,7 @@
                 stepLog.entries.splice(entryIndex, 1);
                 renderLog(); // Re-render
                 refreshPlannerCalendar();
+                saveOfflineData();
             }
         }
 
@@ -2063,6 +2271,7 @@
                 entry[label] = value;
                 // Data is saved in the projectLog object, no need to re-render just for a value change
                 refreshPlannerCalendar();
+                saveOfflineData();
             }
         }
 
@@ -2075,6 +2284,7 @@
             } 
             renderLog();
             refreshPlannerCalendar();
+            saveOfflineData();
         }
 
         function updateDate(id, dateValue) {
@@ -2086,6 +2296,7 @@
             } 
             renderLog();
             refreshPlannerCalendar();
+            saveOfflineData();
         }
 
 
@@ -2441,15 +2652,42 @@
 
         // --- INITIALIZATION ---
         window.onload = () => {
+            loadOfflineData();
             setView('guide'); // Start on the guide page
+            calculateFieldLayout();
+            updateIrrigationAdvice();
             // Add listener for download button
             // We must add it here because the button is part of the reporting-tool div
             const downloadBtn = document.getElementById('download-json-btn');
             if(downloadBtn) {
                 downloadBtn.addEventListener('click', downloadReport);
             }
+            if (rainfallLast7Input) {
+                rainfallLast7Input.addEventListener('input', updateIrrigationAdvice);
+            }
+            if (calcLayoutBtn) {
+                calcLayoutBtn.addEventListener('click', calculateFieldLayout);
+            }
+            [fieldAreaInput, fieldUnitInput, plantSpacingInput, rowSpacingInput, slipBufferInput].forEach((input) => {
+                if (input) input.addEventListener('change', calculateFieldLayout);
+            });
+            if (saveDataBtn) {
+                saveDataBtn.addEventListener('click', saveOfflineData);
+            }
+            if (importJsonBtn && importJsonFile) {
+                importJsonBtn.addEventListener('click', () => importJsonFile.click());
+                importJsonFile.addEventListener('change', (event) => {
+                    const file = event.target.files && event.target.files[0];
+                    importProjectLogFromFile(file);
+                    event.target.value = '';
+                });
+            }
+            if (clearDataBtn) {
+                clearDataBtn.addEventListener('click', clearOfflineData);
+            }
             setupPlannerFilters();
             setupPlannerInteractions();
+            renderLog();
             if (isTestMode()) {
                 runTests().catch((error) => {
                     console.error('Test harness failed:', error);

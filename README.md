@@ -26,6 +26,16 @@ Key metrics like Soil pH, number of slips cut, and pest sightings.
 
 Final harvest results (Total Kg).
 
+Offline save/import tools (save to browser storage, import JSON backups, clear local data).
+
+Farmer decision helpers in the planner:
+
+This-week priority guidance based on your planting date.
+
+Simple rainfall-based irrigation prompt.
+
+Field layout + slip requirement calculator (hectare/acre, spacing, replant buffer).
+
 🚀 How to Use
 
 This is a standalone, single-file application. No server or build process is required.

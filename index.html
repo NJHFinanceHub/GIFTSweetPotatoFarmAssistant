@@ -637,30 +637,72 @@
                 </div>
                 
                 <h4 class="font-bold text-gray-700 mb-2">Schedule Assumptions (Adjust for your Geography):</h4>
-                <div id="assumption-inputs" class="text-sm bg-white p-4 rounded-md border grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    
+                <div id="assumption-inputs" class="text-sm bg-white p-4 rounded-md border grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
                     <label class="block">
                         <span class="text-gray-700 font-medium">Days from Planting to Harvest</span>
-                        <input type="number" id="daysToHarvest" value="120" min="90" max="180" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
-                        <p class="text-xs text-gray-500 mt-1">Key variable based on variety and climate.</p>
+                        <input type="number" id="daysToHarvest" value="105" min="90" max="180" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Default 105 aligns with 3rd slip harvest.</p>
                     </label>
 
                     <label class="block">
                         <span class="text-gray-700 font-medium">Days for Slip Rooting (in water)</span>
                         <input type="number" id="daysPropagation" value="14" min="7" max="30" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
-                        <p class="text-xs text-gray-500 mt-1">Time needed to grow 1-inch roots on slips (Step 3).</p>
+                        <p class="text-xs text-gray-500 mt-1">Time to grow 1-inch roots on slips (Step 3).</p>
                     </label>
 
                     <label class="block">
                         <span class="text-gray-700 font-medium">Days for Mother Sprouting</span>
                         <input type="number" id="daysMotherStart" value="35" min="20" max="60" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
-                        <p class="text-xs text-gray-500 mt-1">Time needed for mother potato to produce slips (Step 1-2).</p>
+                        <p class="text-xs text-gray-500 mt-1">Time for mother potato to produce slips (Step 1-2).</p>
                     </label>
-                    
+
                     <label class="block">
                         <span class="text-gray-700 font-medium">Days for Field Preparation</span>
                         <input type="number" id="daysPrePlantingPrep" value="7" min="1" max="14" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
-                        <p class="text-xs text-gray-500 mt-1">Time needed for soil testing and mounding (Step 4).</p>
+                        <p class="text-xs text-gray-500 mt-1">Time for soil testing and mounding (Step 4).</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days to 1st Slip Harvest</span>
+                        <input type="number" id="daysSlipHarvest1" value="45" min="30" max="90" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">First vine cutting for propagation slips.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days to 2nd Slip Harvest</span>
+                        <input type="number" id="daysSlipHarvest2" value="75" min="45" max="120" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Second vine cutting from regrown vines.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days to 3rd Slip Harvest</span>
+                        <input type="number" id="daysSlipHarvest3" value="105" min="60" max="150" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Final cutting, coincides with potato harvest.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Seed Potato Reserve (%)</span>
+                        <input type="number" id="seedPotatoPct" value="10" min="0" max="30" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">% of harvest to save as seed stock.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Days for Curing</span>
+                        <input type="number" id="daysCuring" value="10" min="5" max="21" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">Curing period after harvest (Step 9).</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Scouting Start (days)</span>
+                        <input type="number" id="daysScoutingStart" value="30" min="14" max="60" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">When to begin pest/disease scouting.</p>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700 font-medium">Scouting Duration (days)</span>
+                        <input type="number" id="daysScoutingDuration" value="60" min="30" max="120" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 text-base" onchange="calculateAndRenderSchedule()">
+                        <p class="text-xs text-gray-500 mt-1">How long the scouting period lasts.</p>
                     </label>
                 </div>
 
@@ -884,17 +926,17 @@
                 description: "Plant the rooted slips into the mounds, burying the roots and most of the stem. Sweet potatoes need full sun, all day. This begins the **Growing Phase**.", 
                 visual: "🌱 → ⛰️ → 💦"
             },
-            { id: 'scouting', title: '6. Smart Step: Pest and Disease Scouting', 
-                description: "During the first 60 days of growth, actively scout your field. Check the underside of leaves for insects or signs of disease. Early detection is key! Log any sightings in the <span class=\"font-bold\">Project Log</span>.", 
+            { id: 'scouting', title: '6. Smart Step: Pest and Disease Scouting',
+                description: "Starting around Day 30 after planting (configurable), actively scout your field for 60 days (configurable). Check the underside of leaves for insects or signs of disease. Early detection is key! Log any sightings in the <span class=\"font-bold\">Project Log</span>.",
                 visual: "🔎 → 🌿 → 🐞"
             },
-            { id: 'manage_vines', title: '7. Care for the Vines (Pruning)', 
-                description: "Water regularly, but let the soil dry out slightly between waterings. If the vines start growing extra roots down into the soil, **cut these extra roots** to force the plant to focus energy on the main tubers.", 
-                visual: "🌿 → ✂️ → 🍠 (BIG)"
+            { id: 'manage_vines', title: '7. Slip Harvesting & Vine Management',
+                description: "Harvest vine cuttings (slips) at 3 intervals for propagation while managing vine health:<br><br><strong>1st Slip Harvest (Day 45):</strong> Cut vine tips (6-8 inches) for rooting as new slips. This also prunes the plant to focus energy on tuber growth.<br><strong>2nd Slip Harvest (Day 75):</strong> Second cutting of mature vine growth. Vines will have regrown vigorously.<br><strong>3rd Slip Harvest + Potato Harvest (Day 105):</strong> Final vine cutting combined with tuber harvest. 10% of harvested potatoes can be reserved as seed stock for next season.<br><br>Between harvests, water regularly but let soil dry slightly between waterings. Cut any adventitious roots growing from vines into soil to focus energy on main tubers.",
+                visual: "🌿 → ✂️ → 🌱🌱🌱 → 🍠"
             },
-            { id: 'harvest', title: '8. Know When to Harvest', 
-                description: "Tubers are ready 90 to 180 days after planting, signaled when vines turn yellow and die back. Dig carefully and remember to log your **Total Harvest (Kg)** in the <span class=\"font-bold\">Project Log</span>!", 
-                visual: "🍂 → ⛏️ → 🧺"
+            { id: 'harvest', title: '8. Know When to Harvest',
+                description: "Tubers are ready around Day 105 (configurable 90-180 days) after planting, signaled when vines turn yellow and die back. The potato harvest typically coincides with the 3rd slip harvest. Dig carefully and log your <strong>Total Harvest (Kg)</strong> in the <span class=\"font-bold\">Project Log</span>! Consider reserving <strong>10% of harvested potatoes as seed stock</strong> for next season's planting.",
+                visual: "🍂 → ⛏️ → 🧺 → 🥔🌱"
             },
             { id: 'cure', title: '9. Curing for Sweetness', 
                 description: "Gently brush off dirt (do NOT wash). Cure them in a warm, dry, dark room (around 75-85°F) for 10 days. This heals cuts and turns starch to sugar.", 
@@ -962,21 +1004,42 @@
                 ], 
                 details: 'Active monitoring period for pests and disease (Days 30-90).' 
             },
-            { id: 'manage_vines', step: 7, activity: 'Vine Management (Pruning)', color: 'green', icon: '✂️', phase: 'Monitoring',
+            { id: 'slip_harvest_1', step: 7, activity: '1st Slip Harvest (Vine Cuttings)', color: 'green', offsetKey: 'daysSlipHarvest1', durationDays: 0, icon: '✂️', phase: 'Monitoring',
                 logFields: [
-                    { label: 'Date Pruned', type: 'date' },
+                    { label: 'Date', type: 'date' },
                     { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
-                    { label: 'Notes', type: 'textarea', placeholder: 'e.g., Pruned runners...' }
+                    { label: 'Vines Harvested (#)', type: 'number', placeholder: 'e.g., 25' },
+                    { label: 'Notes', type: 'textarea', placeholder: 'e.g., Cut 6-inch vine tips...' }
                 ],
-                details: 'Log dates of vine pruning or maintenance.'
+                details: 'First vine cutting at ~Day 45. Cut vine tips for rooting as new slips.'
             },
-            { id: 'harvest', step: 8, activity: 'Harvest Tubers', color: 'brown', offsetKey: 'daysToHarvest', durationDays: 0, icon: '🧺', phase: 'Harvesting', 
+            { id: 'slip_harvest_2', step: 7, activity: '2nd Slip Harvest (Vine Cuttings)', color: 'green', offsetKey: 'daysSlipHarvest2', durationDays: 0, icon: '✂️', phase: 'Monitoring',
+                logFields: [
+                    { label: 'Date', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Vines Harvested (#)', type: 'number', placeholder: 'e.g., 30' },
+                    { label: 'Notes', type: 'textarea', placeholder: 'e.g., Second round of cuttings...' }
+                ],
+                details: 'Second vine cutting at ~Day 75. Mature regrowth provides vigorous cuttings.'
+            },
+            { id: 'slip_harvest_3', step: 7, activity: '3rd Slip Harvest (Vine Cuttings)', color: 'green', offsetKey: 'daysSlipHarvest3', durationDays: 0, icon: '✂️', phase: 'Monitoring',
+                logFields: [
+                    { label: 'Date', type: 'date' },
+                    { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
+                    { label: 'Vines Harvested (#)', type: 'number', placeholder: 'e.g., 20' },
+                    { label: 'Notes', type: 'textarea', placeholder: 'e.g., Final cuttings before harvest...' }
+                ],
+                details: 'Final vine cutting at ~Day 105, coinciding with potato harvest.'
+            },
+            { id: 'harvest', step: 8, activity: 'Harvest Tubers', color: 'brown', offsetKey: 'daysToHarvest', durationDays: 0, icon: '🧺', phase: 'Harvesting',
                 logFields: [
                     { label: 'Harvest Date', type: 'date' },
                     { label: 'Field/Bed ID', type: 'text', placeholder: 'e.g., Bed 1-A' },
-                    { label: 'Total Harvest (Kg)', type: 'number', placeholder: 'e.g., 12.5' }
-                ], 
-                details: 'Dig tubers when vines die back. Log your harvest metrics.' 
+                    { label: 'Total Harvest (Kg)', type: 'number', placeholder: 'e.g., 12.5' },
+                    { label: 'Seed Potatoes Reserved (Kg)', type: 'number', placeholder: 'e.g., 1.25' },
+                    { label: 'Seed Potato %', type: 'number', placeholder: 'e.g., 10' }
+                ],
+                details: 'Dig tubers when vines die back. Reserve a portion as seed potatoes for next season.'
             }, 
             { id: 'cure', step: 9, activity: 'Start Curing', color: 'orange', offsetKey: 'daysToHarvest', durationDays: 10, icon: '🔥', phase: 'Curing', 
                 logFields: [
@@ -1091,10 +1154,17 @@
         let projectLog = {}; 
         const OFFLINE_STORAGE_KEY = 'sweet-potato-assistant-v1';
         const ASSUMPTION_BOUNDS = {
-            daysToHarvest: { min: 90, max: 180, fallback: 120 },
+            daysToHarvest: { min: 90, max: 180, fallback: 105 },
             daysPropagation: { min: 7, max: 30, fallback: 14 },
             daysMotherStart: { min: 20, max: 60, fallback: 35 },
             daysPrePlantingPrep: { min: 1, max: 14, fallback: 7 },
+            daysSlipHarvest1: { min: 30, max: 90, fallback: 45 },
+            daysSlipHarvest2: { min: 45, max: 120, fallback: 75 },
+            daysSlipHarvest3: { min: 60, max: 150, fallback: 105 },
+            seedPotatoPct: { min: 0, max: 30, fallback: 10 },
+            daysCuring: { min: 5, max: 21, fallback: 10 },
+            daysScoutingStart: { min: 14, max: 60, fallback: 30 },
+            daysScoutingDuration: { min: 30, max: 120, fallback: 60 },
         };
 
         const COLORS = {
@@ -1260,7 +1330,11 @@
             const baseSlips = Math.round(areaM2 * plantsPerM2);
             const slipsWithBuffer = Math.round(baseSlips * (1 + Math.max(0, bufferPct) / 100));
 
-            layoutResults.textContent = `Estimated planting spots: ${baseSlips.toLocaleString()} slips. With ${bufferPct}% buffer: ${slipsWithBuffer.toLocaleString()} slips to prepare.`;
+            const seedPct = getAssumptionValue('seedPotatoPct');
+            const estimatedYieldKgPerPlant = 0.5; // rough estimate: 0.5 kg per plant
+            const estimatedHarvestKg = (baseSlips * estimatedYieldKgPerPlant).toFixed(1);
+            const seedReserveKg = (estimatedHarvestKg * seedPct / 100).toFixed(1);
+            layoutResults.innerHTML = `Estimated planting spots: ${baseSlips.toLocaleString()} slips. With ${bufferPct}% buffer: ${slipsWithBuffer.toLocaleString()} slips to prepare.<br><span class="text-green-700 font-medium">Seed potatoes to reserve: ${seedReserveKg} kg (${seedPct}% of estimated ${estimatedHarvestKg} kg harvest)</span>`;
         }
 
         function setActiveTab(viewName) {
@@ -1455,7 +1529,8 @@
             const completedEvents = [];
             baseSchedule.forEach((scheduleItem) => {
                 const stepMeta = steps[scheduleItem.step - 1];
-                const stepId = stepMeta ? stepMeta.id : scheduleItem.id;
+                // For multi-entry steps (e.g. slip harvests), check log by scheduleItem.id first
+                const stepId = projectLog[scheduleItem.id] ? scheduleItem.id : (stepMeta ? stepMeta.id : scheduleItem.id);
                 const stepLog = projectLog[stepId];
                 if (!stepLog) return;
 
@@ -1921,7 +1996,7 @@
             await wait(50);
 
             assert('steps length is 11', steps.length === 11, `found ${steps.length}`);
-            assert('baseSchedule length is 11', baseSchedule.length === 11, `found ${baseSchedule.length}`);
+            assert('baseSchedule length is 13', baseSchedule.length === 13, `found ${baseSchedule.length}`);
             assert('planner actions visible', !plannerActions.classList.contains('hidden'));
             assert('calendar months render', plannerCalendar.querySelectorAll('.calendar-month').length > 0);
             assert('calendar events render', plannerCalendar.querySelectorAll('.calendar-event').length > 0);
@@ -2029,46 +2104,57 @@
             const daysPropagation = getAssumptionValue('daysPropagation');
             const daysMotherStart = getAssumptionValue('daysMotherStart');
             const daysPrePlantingPrep = getAssumptionValue('daysPrePlantingPrep');
-            
+            const daysSlipHarvest1 = getAssumptionValue('daysSlipHarvest1');
+            const daysSlipHarvest2 = getAssumptionValue('daysSlipHarvest2');
+            const daysSlipHarvest3 = getAssumptionValue('daysSlipHarvest3');
+            const daysCuring = getAssumptionValue('daysCuring');
+            const daysScoutingStart = getAssumptionValue('daysScoutingStart');
+            const daysScoutingDuration = getAssumptionValue('daysScoutingDuration');
+
             // Calculate offsets based on user inputs
             const scheduleOffsets = {
                 // Pre-Planting (offsets are calculated backward from Day 0 Planting)
                 'start_mother': -(daysMotherStart + daysPropagation),
-                'cut_slips': -daysPropagation - (daysMotherStart / 2), // Estimate cut slips halfway through sprouting
+                'cut_slips': -daysPropagation - (daysMotherStart / 2),
                 'root_slips': -daysPropagation,
                 'soil_prep': -daysPrePlantingPrep,
-                
+
                 // Growing Phase (Day 0 Planting)
                 'plant_field': 0,
-                'scouting_start': 30, // Fixed start day after planting
-                'manage_vines': 45, // Set offset to 45 days post-planting
-                
+                'scouting_start': daysScoutingStart,
+                'slip_harvest_1': daysSlipHarvest1,
+                'slip_harvest_2': daysSlipHarvest2,
+                'slip_harvest_3': daysSlipHarvest3,
+
                 // Post-Planting (offsets are calculated forward from Day 0 Planting)
                 'harvest': daysToHarvest,
-                'cure': daysToHarvest, // Curing starts on harvest day
-                'storage': daysToHarvest + 10, // Storage starts 10 days after harvest/curing starts
-                'sale': daysToHarvest + 10, // Sales can start after curing/storage begins
+                'cure': daysToHarvest,
+                'storage': daysToHarvest + daysCuring,
+                'sale': daysToHarvest + daysCuring,
             };
 
             const dynamicSchedule = baseSchedule.map(event => {
-                let offset = scheduleOffsets[event.id] || 0;
+                let offset = scheduleOffsets[event.id] !== undefined ? scheduleOffsets[event.id] : 0;
                 let duration = event.durationDays;
-                
+
                 // Special Duration Overrides (if defined by user inputs)
                 if (event.durationKey === 'daysMotherStart') duration = daysMotherStart;
                 if (event.durationKey === 'daysPropagation') duration = daysPropagation;
                 if (event.durationKey === 'daysPrePlantingPrep') duration = daysPrePlantingPrep;
                 if (event.durationKey === 'daysToHarvest') duration = daysToHarvest;
-                
-                // Special case for scouting, which has fixed days in the baseSchedule definition
-                if (event.id === 'scouting_start') duration = event.durationDays; 
+
+                // Scouting uses configurable duration
+                if (event.id === 'scouting_start') duration = daysScoutingDuration;
+
+                // Curing uses configurable duration
+                if (event.id === 'cure') duration = daysCuring;
 
                 return {
                     ...event,
                     offsetDays: offset,
                     durationDays: duration
                 };
-            }).sort((a, b) => a.offsetDays - b.offsetDays); // Sort by calculated offset
+            }).sort((a, b) => a.offsetDays - b.offsetDays);
 
             return dynamicSchedule;
         }
@@ -2175,56 +2261,61 @@
 
         // --- ACTIVITY LOG LOGIC (REFACTORED) ---
         
+        function renderLogCard(logId, label, stepNum, visual, logFields) {
+            const stepLog = projectLog[logId] || { done: false, date: '', entries: [] };
+            let entriesHtml = '<div class="space-y-3 mt-4">';
+            stepLog.entries.forEach((entry, entryIndex) => {
+                entriesHtml += renderLogEntry(logId, entryIndex, logFields, entry);
+            });
+            entriesHtml += '</div>';
+            const contentId = `log-content-${logId}`;
+            return `
+                <div class="p-4 activity-log-card bg-white rounded-lg border-l-4 ${stepLog.done ? 'border-green-600' : 'border-gray-300'}">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('${contentId}')" data-controls="${contentId}" aria-controls="${contentId}" aria-expanded="true">
+                        <p class="font-bold text-gray-700">${visual} ${label}</p>
+                        <div class="flex items-center">
+                            <label class="flex items-center space-x-2 mr-4" onclick="event.stopPropagation();">
+                                <input type="checkbox" ${stepLog.done ? 'checked' : ''} onchange="toggleDone('${logId}', this.checked)" class="h-5 w-5 text-green-600 rounded">
+                                <span class="text-sm font-medium text-gray-600">Done</span>
+                            </label>
+                            <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div id="${contentId}" class="collapsible-content mt-4">
+                        <label for="${logId}-date" class="block text-sm font-medium text-gray-700 mt-2">Overall Completion Date:</label>
+                        <input type="date" id="${logId}-date" value="${stepLog.date}" onchange="updateDate('${logId}', this.value)" class="p-2 border rounded-md shadow-inner w-full mb-3 text-sm">
+                        <h5 class="font-semibold text-gray-700 mt-4 border-t pt-3">Data Entries:</h5>
+                        ${entriesHtml}
+                        <button onclick="addLogEntry('${logId}')" class="mt-4 w-full btn-secondary py-2 text-sm rounded-lg font-semibold">
+                            + Add New Entry
+                        </button>
+                        <p id="${logId}-status" class="text-xs text-green-600 mt-2 font-medium"></p>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderLog() {
             let html = '';
             steps.forEach((step, index) => {
-                // Find corresponding schedule data for log fields
-                const logData = baseSchedule.find(d => d.step === index + 1);
-                
-                // Skip steps that have no loggable fields (like 7, 9, 10, 11)
-                // UPDATED: This check is now dynamic based on logFields.
-                if (!logData || !logData.logFields || logData.logFields.length === 0) return; 
+                // Find ALL corresponding schedule entries for log fields
+                const logEntries = baseSchedule.filter(d => d.step === index + 1 && d.logFields && d.logFields.length > 0);
+                if (logEntries.length === 0) return;
 
-                const stepLog = projectLog[step.id] || { done: false, date: '', entries: [] };
-                
-                // Render the individual entries for this step
-                let entriesHtml = '<div class="space-y-3 mt-4">';
-                stepLog.entries.forEach((entry, entryIndex) => {
-                    entriesHtml += renderLogEntry(step.id, entryIndex, logData.logFields, entry);
-                });
-                entriesHtml += '</div>';
-
-                const contentId = `log-content-${step.id}`;
-
-                html += `
-                    <div class="p-4 activity-log-card bg-white rounded-lg border-l-4 ${stepLog.done ? 'border-green-600' : 'border-gray-300'}">
-                        <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('${contentId}')" data-controls="${contentId}" aria-controls="${contentId}" aria-expanded="true">
-                            <p class="font-bold text-gray-700">${step.visual.replace(/→/g, '→')} Step ${index + 1}: ${step.title}</p>
-                            <div class="flex items-center">
-                                <label class="flex items-center space-x-2 mr-4" onclick="event.stopPropagation();">
-                                    <input type="checkbox" ${stepLog.done ? 'checked' : ''} onchange="toggleDone('${step.id}', this.checked)" class="h-5 w-5 text-green-600 rounded">
-                                    <span class="text-sm font-medium text-gray-600">Done</span>
-                                </label>
-                                <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
-                            </div>
-                        </button>
-                        
-                        <div id="${contentId}" class="collapsible-content mt-4">
-                            <label for="${step.id}-date" class="block text-sm font-medium text-gray-700 mt-2">Overall Completion Date (for this step):</label>
-                            <input type="date" id="${step.id}-date" value="${stepLog.date}" onchange="updateDate('${step.id}', this.value)" class="p-2 border rounded-md shadow-inner w-full mb-3 text-sm">
-                            
-                            <h5 class="font-semibold text-gray-700 mt-4 border-t pt-3">Data Entries:</h5>
-                            ${entriesHtml}
-                            
-                            <button onclick="addLogEntry('${step.id}')" class="mt-4 w-full btn-secondary py-2 text-sm rounded-lg font-semibold">
-                                + Add New Entry for Step ${index + 1}
-                            </button>
-                            <p id="${step.id}-status" class="text-xs text-green-600 mt-2 font-medium"></p>
-                        </div>
-                    </div>
-                `;
+                if (logEntries.length === 1) {
+                    // Single entry per step: use step.id as log key (preserves existing behavior)
+                    const logData = logEntries[0];
+                    const visual = step.visual.replace(/→/g, '→');
+                    html += renderLogCard(step.id, `Step ${index + 1}: ${step.title}`, index + 1, visual, logData.logFields);
+                } else {
+                    // Multiple entries per step (e.g., 3 slip harvests): render each with its own baseSchedule id
+                    logEntries.forEach(logData => {
+                        const visual = logData.icon || step.visual.replace(/→/g, '→');
+                        html += renderLogCard(logData.id, `Step ${index + 1}: ${logData.activity}`, index + 1, visual, logData.logFields);
+                    });
+                }
             });
 
             logEntriesContainer.innerHTML = html;
@@ -2279,17 +2370,21 @@
 
         function addLogEntry(stepId) {
             projectLog[stepId] = projectLog[stepId] || { done: false, date: '', entries: [] };
-            
-            const logData = baseSchedule.find(d => d.step === steps.findIndex(s => s.id === stepId) + 1);
+
+            // Look up log fields: first try direct baseSchedule id match, then by step index
+            let logData = baseSchedule.find(d => d.id === stepId);
+            if (!logData) {
+                logData = baseSchedule.find(d => d.step === steps.findIndex(s => s.id === stepId) + 1);
+            }
             if (!logData) return;
 
             const newEntry = {};
             logData.logFields.forEach(field => {
-                newEntry[field.label] = ''; // Initialize with empty values
+                newEntry[field.label] = '';
             });
 
             projectLog[stepId].entries.push(newEntry);
-            renderLog(); // Re-render the log to show the new entry form
+            renderLog();
             refreshPlannerCalendar();
             saveOfflineData();
         }
@@ -2355,7 +2450,11 @@
             const soilTests = projectLog['soil_prep']?.entries || [];
             const pestSightings = projectLog['scouting']?.entries || [];
             const harvests = projectLog['harvest']?.entries || [];
-            const sales = projectLog['sale']?.entries || []; // NEW: Get sales data
+            const sales = projectLog['sale']?.entries || [];
+            const slipHarvest1 = projectLog['slip_harvest_1']?.entries || [];
+            const slipHarvest2 = projectLog['slip_harvest_2']?.entries || [];
+            const slipHarvest3 = projectLog['slip_harvest_3']?.entries || [];
+            const allSlipHarvests = [...slipHarvest1, ...slipHarvest2, ...slipHarvest3];
 
             // Totals
             const totalMothers = mothers.length;
@@ -2363,6 +2462,8 @@
             const totalSlipsRooted = slipsRooted.reduce((sum, entry) => sum + (parseFloat(entry['Slips Put in Water']) || 0), 0);
             const totalSlipsPlanted = slipsPlanted.reduce((sum, entry) => sum + (parseFloat(entry['Slips Planted']) || 0), 0);
             const totalHarvestKg = harvests.reduce((sum, entry) => sum + (parseFloat(entry['Total Harvest (Kg)']) || 0), 0);
+            const totalVinesHarvested = allSlipHarvests.reduce((sum, entry) => sum + (parseFloat(entry['Vines Harvested (#)']) || 0), 0);
+            const totalSeedPotatoKg = harvests.reduce((sum, entry) => sum + (parseFloat(entry['Seed Potatoes Reserved (Kg)']) || 0), 0);
             const totalSoldKg = sales.reduce((sum, entry) => sum + (parseFloat(entry['Quantity Sold (Kg)']) || 0), 0); // NEW
             const totalRevenue = sales.reduce((sum, entry) => { // NEW
                 const qty = parseFloat(entry['Quantity Sold (Kg)']) || 0;
@@ -2412,6 +2513,14 @@
                             <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
                                 <p class="text-3xl font-bold text-yellow-700">${totalHarvestKg.toFixed(1)} Kg</p>
                                 <p class="text-sm font-medium text-gray-600">Total Harvest</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-green-700">${totalVinesHarvested}</p>
+                                <p class="text-sm font-medium text-gray-600">Vine Cuttings Harvested</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg shadow-sm border">
+                                <p class="text-3xl font-bold text-amber-600">${totalSeedPotatoKg.toFixed(1)} Kg</p>
+                                <p class="text-sm font-medium text-gray-600">Seed Potatoes Reserved</p>
                             </div>
                         </div>
                     </div>
@@ -2480,7 +2589,34 @@
                         </svg>
                     </button>
                     <div id="report-harvest" class="collapsible-content mt-4">
-                        ${createTableHtml(harvests, ['Harvest Date', 'Field/Bed ID', 'Total Harvest (Kg)'])}
+                        ${createTableHtml(harvests, ['Harvest Date', 'Field/Bed ID', 'Total Harvest (Kg)', 'Seed Potatoes Reserved (Kg)', 'Seed Potato %'])}
+                    </div>
+                </div>
+
+                <!-- Slip Harvests -->
+                <div class="report-section mb-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleSection('report-slipharvests')" data-controls="report-slipharvests" aria-controls="report-slipharvests" aria-expanded="true">
+                        <h5 class="text-xl font-semibold text-gray-700">Slip Harvests (${totalVinesHarvested} total vine cuttings across ${allSlipHarvests.length} entries)</h5>
+                        <svg class="chevron-icon w-5 h-5 text-gray-600" data-icon="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                    <div id="report-slipharvests" class="collapsible-content mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center p-3 bg-green-50 rounded-lg border">
+                                <p class="text-2xl font-bold text-green-700">${slipHarvest1.reduce((s,e) => s + (parseFloat(e['Vines Harvested (#)']) || 0), 0)}</p>
+                                <p class="text-sm font-medium text-gray-600">1st Harvest (Day ${getAssumptionValue('daysSlipHarvest1')})</p>
+                            </div>
+                            <div class="text-center p-3 bg-green-50 rounded-lg border">
+                                <p class="text-2xl font-bold text-green-700">${slipHarvest2.reduce((s,e) => s + (parseFloat(e['Vines Harvested (#)']) || 0), 0)}</p>
+                                <p class="text-sm font-medium text-gray-600">2nd Harvest (Day ${getAssumptionValue('daysSlipHarvest2')})</p>
+                            </div>
+                            <div class="text-center p-3 bg-green-50 rounded-lg border">
+                                <p class="text-2xl font-bold text-green-700">${slipHarvest3.reduce((s,e) => s + (parseFloat(e['Vines Harvested (#)']) || 0), 0)}</p>
+                                <p class="text-sm font-medium text-gray-600">3rd Harvest (Day ${getAssumptionValue('daysSlipHarvest3')})</p>
+                            </div>
+                        </div>
+                        ${createTableHtml(allSlipHarvests, ['Date', 'Field/Bed ID', 'Vines Harvested (#)', 'Notes'])}
                     </div>
                 </div>
 

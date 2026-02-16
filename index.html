@@ -1090,7 +1090,13 @@
         // }
         let projectLog = {}; 
         const OFFLINE_STORAGE_KEY = 'sweet-potato-assistant-v1';
-        
+        const ASSUMPTION_BOUNDS = {
+            daysToHarvest: { min: 90, max: 180, fallback: 120 },
+            daysPropagation: { min: 7, max: 30, fallback: 14 },
+            daysMotherStart: { min: 20, max: 60, fallback: 35 },
+            daysPrePlantingPrep: { min: 1, max: 14, fallback: 7 },
+        };
+
         const COLORS = {
             'orange': 'border-orange-500 bg-orange-100',
             'blue': 'border-blue-500 bg-blue-100',
@@ -1115,13 +1121,35 @@
             storageStatus.classList.toggle('text-gray-600', !isError);
         }
 
-        function saveOfflineData() {
+        function isQuotaExceededError(error) {
+            return Boolean(error) && (
+                error.name === 'QuotaExceededError' || error.code === 22 || error.code === 1014
+            );
+        }
+
+        function clampNumber(value, min, max, fallback) {
+            const numeric = Number(value);
+            if (!Number.isFinite(numeric)) return fallback;
+            if (numeric < min) return min;
+            if (numeric > max) return max;
+            return numeric;
+        }
+
+        function saveOfflineData(options = {}) {
             try {
                 localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify({ projectLog }));
-                setStatusMessage(`Saved offline at ${new Date().toLocaleString()}.`);
+                if (!options.suppressStatus) {
+                    setStatusMessage(`Saved offline at ${new Date().toLocaleString()}.`);
+                }
+                return true;
             } catch (error) {
                 console.error('Failed to save offline data:', error);
-                setStatusMessage('Could not save data on this device.', true);
+                if (isQuotaExceededError(error)) {
+                    setStatusMessage('Storage full — free space in your browser settings.', true);
+                } else {
+                    setStatusMessage('Could not save data on this device.', true);
+                }
+                return false;
             }
         }
 
@@ -1162,11 +1190,15 @@
                     const parsed = JSON.parse(String(reader.result || '{}'));
                     if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON');
                     projectLog = parsed.projectLog && typeof parsed.projectLog === 'object' ? parsed.projectLog : parsed;
-                    saveOfflineData();
+                    const saved = saveOfflineData({ suppressStatus: true });
                     renderLog();
                     refreshPlannerCalendar();
                     renderReport(true);
-                    setStatusMessage('Imported data successfully.');
+                    if (saved) {
+                        setStatusMessage('Imported data successfully.');
+                    } else {
+                        setStatusMessage('Imported but could not persist — storage may be full.', true);
+                    }
                 } catch (error) {
                     console.error('Import failed:', error);
                     setStatusMessage('Import failed: please choose a valid JSON export file.', true);
@@ -1259,10 +1291,12 @@
         }
 
         function parseLocalDate(dateStr) {
-            if (!dateStr) return null;
+            if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
             const [year, month, day] = dateStr.split('-').map(Number);
             if (!year || !month || !day) return null;
-            return new Date(year, month - 1, day);
+            const parsedDate = new Date(year, month - 1, day);
+            if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) return null;
+            return parsedDate;
         }
 
         function addDays(date, days) {
@@ -1364,7 +1398,12 @@
 
         // Helper to safely get value from assumption inputs
         const getAssumptionValue = (id) => {
-            return parseFloat(document.getElementById(id)?.value) || 0;
+            const input = document.getElementById(id);
+            const bounds = ASSUMPTION_BOUNDS[id];
+            if (!bounds) return parseFloat(input?.value) || 0;
+            const bounded = clampNumber(input?.value, bounds.min, bounds.max, bounds.fallback);
+            if (input) input.value = String(bounded);
+            return bounded;
         };
 
         function syncCollapsibleHeights(root = document) {
